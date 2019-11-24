@@ -1,17 +1,20 @@
 import React from 'react'
 import './App.css'
-import Map from  './components/Map'
 import { Route, Switch, BrowserRouter } from 'react-router-dom'
+import Home from "./Home";
+import Map from  './components/Map'
+
+import "tabler-react/dist/Tabler.css";
+import SearchableMap from './components/SearchableMap';
 
 function App() {
   return (
-      <div>
-        <BrowserRouter >
-          <Switch>
-            <Route exact path="/" component={Map} />
-          </Switch>
-        </BrowserRouter>
-      </div>
+    <BrowserRouter >
+      <Switch>
+          <Route exact path="/" component={ Home } />
+          <Route exact path="/maps" component={ SearchableMap } />
+      </Switch>
+    </BrowserRouter>
   )
 }
 export default App

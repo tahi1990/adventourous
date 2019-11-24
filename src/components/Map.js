@@ -1,5 +1,7 @@
 import React,{ useState } from 'react'
 import MapGL, {GeolocateControl } from 'react-map-gl'
+import {Page} from 'tabler-react';
+import SiteWrapper from '../SiteWrapper';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 
@@ -25,20 +27,22 @@ const Map = () => {
     const _onViewportChange = viewport => setViewPort({...viewport});
 
     return (
-        <div style={{ margin: '0 auto'}}>
-            <MapGL
-                {...viewport}
-                mapboxApiAccessToken={TOKEN}
-                mapStyle="mapbox://styles/mapbox/streets-v11"
-                onViewportChange={_onViewportChange}
-            >
-                <GeolocateControl
-                    style={style}
-                    positionOptions={{enableHighAccuracy: true}}
-                    trackUserLocation={true}
-                />
-            </MapGL>
-        </div>
+        <SiteWrapper>
+            <Page.Content title="Dashboard">
+                <MapGL
+                    {...viewport}
+                    mapboxApiAccessToken={TOKEN}
+                    mapStyle="mapbox://styles/mapbox/streets-v11"
+                    onViewportChange={_onViewportChange}
+                >
+                    <GeolocateControl
+                        style={style}
+                        positionOptions={{enableHighAccuracy: true}}
+                        trackUserLocation={true}
+                    />
+                </MapGL>
+            </Page.Content>
+        </SiteWrapper>
     )
 };
 
