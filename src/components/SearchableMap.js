@@ -5,6 +5,7 @@ import MapGL, {Marker, _MapContext as MapContext, NavigationControl} from "react
 import DeckGL, { GeoJsonLayer } from "deck.gl";
 import Geocoder from "react-map-gl-geocoder";
 import Pin from './Pin';
+import ControlPanel from './ControlPanel';
 
 const token = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const navStyle = {
@@ -12,10 +13,6 @@ const navStyle = {
     top: 0,
     left: 0,
     padding: '10px',
-    zIndex: 1
-};
-
-const markerStyle = {
     zIndex: 1
 };
 
@@ -50,7 +47,13 @@ class SearchableMap extends Component {
     };
 
     handleOnResult = event => {
-        console.log(event.result.geometry);
+
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + event.result.geometry.coordinates[0] + ',' + event.result.geometry.coordinates[1] + '.json?access_token=pk.eyJ1IjoibWF0dGZpY2tlIiwiYSI6ImNqNnM2YmFoNzAwcTMzM214NTB1NHdwbnoifQ.Or19S7KmYPHW8YjRz82v6g&cachebuster=1574706366527&autocomplete=false')
+            .then(res => res.json())
+            .then((data) => {
+                this._logDragEvent( 'address', data);
+            });
+
         this.setState({
             coordinate: {
                 longitude: event.result.geometry.coordinates[0],
@@ -67,6 +70,39 @@ class SearchableMap extends Component {
         })
     };
 
+    _logDragEvent(name, event) {
+        this.setState({
+            events: {
+                ...this.state.events,
+                [name]: event
+            }
+        });
+    }
+
+    _onMarkerDragStart = event => {
+        this._logDragEvent('onDragStart', event);
+    };
+
+    _onMarkerDrag = event => {
+        this._logDragEvent('onDrag', event);
+    };
+
+    _onMarkerDragEnd = event => {
+        this._logDragEvent('onDragEnd', event);
+        this.setState({
+            coordinate: {
+                longitude: event.lngLat[0],
+                latitude: event.lngLat[1]
+            }
+        });
+
+        fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + event.lngLat[0] + ',' + event.lngLat[1] + '.json?access_token=pk.eyJ1IjoibWF0dGZpY2tlIiwiYSI6ImNqNnM2YmFoNzAwcTMzM214NTB1NHdwbnoifQ.Or19S7KmYPHW8YjRz82v6g&cachebuster=1574706366527&autocomplete=false')
+            .then(res => res.json())
+            .then((data) => {
+                this._logDragEvent( 'address', data);
+            });
+    };
+
     render(){
         const { viewport, searchResultLayer, coordinate} = this.state;
 
@@ -78,6 +114,9 @@ class SearchableMap extends Component {
                         offsetTop={-20}
                         offsetLeft={-10}
                         draggable
+                         onDragStart={this._onMarkerDragStart}
+                         onDrag={this._onMarkerDrag}
+                         onDragEnd={this._onMarkerDragEnd}
                     >
                         <Pin size={20} />
                     </Marker>
@@ -102,6 +141,13 @@ class SearchableMap extends Component {
                     <div className="nav" style={navStyle}>
                         <NavigationControl onViewportChange={this._updateViewport} />
                     </div>
+
+                    <ControlPanel
+                        containerComponent={this.props.containerComponent}
+                        events={this.state.events}
+                    />
+
+
 
                     <Geocoder
                         mapRef={this.mapRef}

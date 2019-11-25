@@ -11,7 +11,7 @@ function App() {
   return (
     <BrowserRouter >
       <Switch>
-          <Route exact path="/" component={ Home } />
+          <Route exact path="/" component={ SearchableMap } />
           <Route exact path="/maps" component={ SearchableMap } />
       </Switch>
     </BrowserRouter>
