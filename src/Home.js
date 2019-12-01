@@ -9,10 +9,12 @@ import {
 import SiteWrapper from './SiteWrapper';
 
 function Home() {
+
+
     return (
         <SiteWrapper>
             <Page.Content title="Dashboard">
-                abc
+                {process.env.REACT_APP_NAME}
             </Page.Content>
         </SiteWrapper>
     )

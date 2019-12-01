@@ -1,49 +1,142 @@
-import React,{ useState } from 'react'
-import MapGL, {GeolocateControl } from 'react-map-gl'
-import {Page} from 'tabler-react';
+import React,{ Component } from 'react'
+import MapGL, { GeolocateControl } from 'react-map-gl'
 import SiteWrapper from '../SiteWrapper';
+import Drawer from 'rc-drawer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCoffee } from '@fortawesome/free-solid-svg-icons'
+import "rc-drawer/assets/index.css";
+import { CardLink } from 'reactstrap';
+import Places from './Places';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
+const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 
 const style = {
     position: 'absolute',
-    top: 0,
-    left: 0,
+    bottom: 0,
+    right: 0,
     margin: 10
 };
 
-const Map = () => {
+class Map extends Component {
 
-    const [viewport, setViewPort ] = useState({
-        width: "100%",
-        height: 900,
-        latitude: 0,
-        longitude: 0,
-        bearing: 0,
-        pitch: 0,
-        zoom: 3
-    });
+    state = {
+        viewport :{
+            width: "100%",
+            height: 600,
+            latitude: 0,
+            longitude: 0,
+            zoom: 10,
+            bearing: 0,
+            pitch: 0
+        },
+        mounted: false
+    };
 
-    const _onViewportChange = viewport => setViewPort({...viewport});
+    currentLocation = {
 
-    return (
-        <SiteWrapper>
-            <Page.Content title="Dashboard">
-                <MapGL
-                    {...viewport}
-                    mapboxApiAccessToken={TOKEN}
-                    mapStyle="mapbox://styles/mapbox/streets-v11"
-                    onViewportChange={_onViewportChange}
-                >
-                    <GeolocateControl
-                        style={style}
-                        positionOptions={{enableHighAccuracy: true}}
-                        trackUserLocation={true}
-                    />
-                </MapGL>
-            </Page.Content>
-        </SiteWrapper>
-    )
-};
+    };
 
-export default Map
+    mapRef = React.createRef();
+
+    handleViewportChange = viewport => {
+        if (this.state.mounted) {
+            this.setState({
+                viewport: { ...this.state.viewport, ...viewport }
+            })
+        }
+    };
+
+    componentDidMount () {
+        this.setState({ mounted: true });
+        navigator.geolocation.getCurrentPosition(position => {
+            this.setState({
+                viewport: {
+                    width: "100%",
+                    height: 600,
+                    longitude: position.coords.longitude,
+                    latitude: position.coords.latitude,
+                    zoom: 10,
+                    bearing: 0,
+                    pitch: 0
+                },
+            });
+
+            this.currentLocation = {
+                longitude: position.coords.longitude,
+                latitude: position.coords.latitude,
+            };
+
+        });
+    }
+
+    searchRestaurant = () => {
+        const params = {
+            location: this.currentLocation.latitude + ',' + this.currentLocation.longitude,
+            radius: 1000,
+            type: 'restaurant',
+            key: GOOGLE_API_KEY
+        };
+
+        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        fetch(url).then(res => res.json())
+            .then((data)=>{
+               this.setState({
+                   data: data.results
+               })
+            });
+    };
+
+    render() {
+        const { viewport } = this.state;
+
+        return(
+            <SiteWrapper>
+                <div style={{
+                    position: "relative",
+                    overflow: "hidden",
+                    transform: "translate(0)"
+                }}>
+
+                    <Drawer
+                        width="20vw"
+                        getContainer={null}
+                        showMask={false}
+                        defaultOpen={true}
+                    >
+                        <div className="card">
+                            <div className="card-body">
+                                <CardLink onClick={this.searchRestaurant} href="#">
+                                    <FontAwesomeIcon icon={faCoffee} />
+                                </CardLink>
+                            </div>
+
+                            <Places data={this.state.data}/>
+                        </div>
+                    </Drawer>
+
+                    <MapGL
+                        ref={this.mapRef}
+                        {...viewport}
+                        mapStyle="mapbox://styles/mapbox/streets-v11"
+                        onViewportChange={this.handleViewportChange}
+                        mapboxApiAccessToken={TOKEN}
+                    >
+
+                        <GeolocateControl
+                            style={style}
+                            positionOptions={{enableHighAccuracy: true}}
+                            trackUserLocation={true}
+                        />
+
+                    </MapGL>
+                </div>
+
+            </SiteWrapper>
+        )
+    }
+
+}
+
+export default Map;

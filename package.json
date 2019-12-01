@@ -3,17 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/react-fontawesome": "^0.1.7",
     "deck.gl": "^7.3.6",
     "google-maps-react": "^2.0.2",
+    "rc-drawer": "^3.0.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-facebook-login": "^4.1.1",
     "react-google-login": "^5.0.7",
     "react-map-gl": "^5.1.2",
-    "react-map-gl-geocoder": "^2.0.11",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
     "reactstrap": "^8.1.1",
+    "semantic-ui-react": "^0.88.1",
     "tabler-react": "^1.30.1"
   },
   "scripts": {

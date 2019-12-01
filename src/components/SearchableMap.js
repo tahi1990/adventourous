@@ -1,9 +1,8 @@
 import "mapbox-gl/dist/mapbox-gl.css"
-import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css"
+// import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css"
 import React, { Component } from 'react'
 import MapGL, {Marker, _MapContext as MapContext, NavigationControl} from "react-map-gl";
 import DeckGL, { GeoJsonLayer } from "deck.gl";
-import Geocoder from "react-map-gl-geocoder";
 import Pin from './Pin';
 import ControlPanel from './ControlPanel';
 
@@ -149,13 +148,13 @@ class SearchableMap extends Component {
 
 
 
-                    <Geocoder
-                        mapRef={this.mapRef}
-                        onResult={this.handleOnResult}
-                        onViewportChange={this.handleGeocoderViewportChange}
-                        mapboxApiAccessToken={token}
-                        position='top-right'
-                    />
+                    {/*<Geocoder*/}
+                    {/*    mapRef={this.mapRef}*/}
+                    {/*    onResult={this.handleOnResult}*/}
+                    {/*    onViewportChange={this.handleGeocoderViewportChange}*/}
+                    {/*    mapboxApiAccessToken={token}*/}
+                    {/*    position='top-right'*/}
+                    {/*/>*/}
                     <DeckGL {...viewport} layers={[searchResultLayer]} ContextProvider={MapContext.Provider}/>
                 </MapGL>
 

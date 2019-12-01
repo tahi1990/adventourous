@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from 'tabler-react';
 import { Modal, ModalBody } from 'reactstrap';
-import FacebookLogin from 'react-facebook-login';
 import GoogleLogin from 'react-google-login';
+import {userService} from '../services';
 
 class LoginModal extends React.Component {
 
@@ -19,12 +19,11 @@ class LoginModal extends React.Component {
 
     render() {
 
-        const responseFacebook = (response) => {
-            console.log(response);
-        };
-
         const responseGoogle = (response) => {
-            console.log(response);
+            this.setState({
+               show: false
+            });
+            userService.login(response);
         };
 
         return (
@@ -39,11 +38,6 @@ class LoginModal extends React.Component {
                     fade={false}
                     centered>
                     <ModalBody>
-                        <FacebookLogin
-                            appId="453251752046824"
-                            fields="name,email,picture"
-                            callback={responseFacebook}
-                        />
 
                         <GoogleLogin
                             clientId="316554476346-as93qvh4ij65kth8o3kme3ve851p66n4.apps.googleusercontent.com"
@@ -51,6 +45,7 @@ class LoginModal extends React.Component {
                             onSuccess={responseGoogle}
                             onFailure={responseGoogle}
                         />
+
                     </ModalBody>
                 </Modal>
             </div>
