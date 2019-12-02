@@ -1,5 +1,6 @@
 import React,{ Component } from 'react'
-import MapGL, { GeolocateControl, Marker } from 'react-map-gl'
+import MapGL, {_MapContext as MapContext, GeolocateControl, Marker} from 'react-map-gl'
+import DeckGL, {ArcLayer, PathLayer} from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
 import { Container, Header, Grid, Button, Icon } from 'semantic-ui-react'
@@ -10,6 +11,7 @@ import Places from './Places';
 import _ from 'lodash';
 
 import restaurant from '../assets/images/restaurants.png';
+import PlaceDetails from './PlaceDetails';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
@@ -33,6 +35,7 @@ class Map extends Component {
             bearing: 0,
             pitch: 0
         },
+        layer: null,
         markers: [],
         mounted: false
     };
@@ -60,7 +63,7 @@ class Map extends Component {
                     height: 600,
                     longitude: position.coords.longitude,
                     latitude: position.coords.latitude,
-                    zoom: 10,
+                    zoom: 13,
                     bearing: 0,
                     pitch: 0
                 },
@@ -79,10 +82,16 @@ class Map extends Component {
             <Container style={{ padding: '1em' }}>
                 <Header as='h3'>Search this area</Header>
                 <Grid.Column key={1}>
-                    <Button icon color='teal' onClick={this.searchRestaurant}>
+                    <Button icon color='teal' onClick={() => {
+                        this.getDirections();
+                        // this.getPlace();
+                        // this.getPlacePhoto();
+                    }}>
                         <Icon circular inverted color='teal' name='food'/>
                     </Button>
                 </Grid.Column>
+
+                <PlaceDetails data={this.state.place} image={this.state.image}/>
             </Container>
         );
     };
@@ -99,8 +108,6 @@ class Map extends Component {
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-                const markers = _.map(data.results, i => _.pick(i, ['geometry.location', 'place_id']));
-
                 this.setState({
                     data: data.results,
                     markers: data.results,
@@ -114,6 +121,42 @@ class Map extends Component {
                         pitch: 0
                     }
                 })
+            });
+    };
+
+    getPlace = () => {
+        const params = {
+            place_id: 'ChIJBbYqR32Gm0YR4oy5Ekc8wOw',
+            key: GOOGLE_API_KEY,
+        };
+
+        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        fetch(url).then(res => res.json())
+            .then((data)=>{
+               this.setState({
+                   place: data.result.name
+               })
+            });
+    };
+
+    getPlacePhoto = () => {
+        const params = {
+            photoreference: 'CmRaAAAAzGaOKh78YOpMVW4_JrYZ0TekPgwLezGqA_DT6y0scnPd1aOe2yZrA13_8SPXvriaJgF-LeEiGeRZ61RlIFmUgv1k0CM9DpE50ARXs-a6xIuDktKQEEoh7CmBx_AYoTuxEhCasnQkd9cKKpat8ywrX0yOGhRWbCaUnorszJ5OKHOxa9sPBSFgog',
+            maxwidth: 400,
+            key: GOOGLE_API_KEY,
+        };
+
+        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        fetch(url).then(res => res.blob())
+            .then(convertBlobToBase64)
+            .then(image => {
+                this.setState({
+                    image: image
+                });
             });
     };
 
@@ -132,8 +175,50 @@ class Map extends Component {
         });
     };
 
+    getDirections = () => {
+
+        const params = {
+            access_token: TOKEN,
+            geometries: 'geojson',
+            overview: 'full'
+        };
+
+        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.currentLocation.longitude + ',' + this.currentLocation.latitude + ';29.7712492,62.59938889999999');
+        // const url = new URL('https://api.mapbox.com/directions/v5/mapbox/walking/' + '29.768538,62.592495;29.76742, 62.594139');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        fetch(url).then(res => res.json())
+            .then((response)=>{
+                console.log(response);
+                // const path = _.map(response.waypoints, 'location');
+                // const path = _.map(response.routes, 'geometry.coordinates');
+                const path = response.routes[0].geometry.coordinates;
+
+                const data = [{
+                    name: "random-name",
+                    color: [101, 147, 245],
+                    path: path
+                }];
+
+                const layer = [
+                    new PathLayer({
+                        id: "path-layer",
+                        data,
+                        getWidth: data => 4,
+                        getColor: data => data.color,
+                        widthMinPixels: 4
+                    })
+                ];
+
+                this.setState({
+                    layer: layer
+                });
+            });
+
+    };
+
     render() {
-        const { viewport } = this.state;
+        const { viewport, layer } = this.state;
 
         return(
             <SiteWrapper>
@@ -169,14 +254,17 @@ class Map extends Component {
                         onViewportChange={this.handleViewportChange}
                         mapboxApiAccessToken={TOKEN}
                     >
-
-                        {this.loadMarkers()}
-
-                        <GeolocateControl
-                            style={style}
-                            positionOptions={{enableHighAccuracy: true}}
-                            trackUserLocation={true}
+                        <DeckGL
+                            viewState={viewport}
+                            layers={layer}
                         />
+                        {/*{this.loadMarkers()}*/}
+
+                        {/*<GeolocateControl*/}
+                        {/*    style={style}*/}
+                        {/*    positionOptions={{enableHighAccuracy: true}}*/}
+                        {/*    trackUserLocation={true}*/}
+                        {/*/>*/}
 
                     </MapGL>
                 </div>
@@ -186,5 +274,14 @@ class Map extends Component {
     }
 
 }
+
+const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
+    const reader = new FileReader;
+    reader.onerror = reject;
+    reader.onload = () => {
+        resolve(reader.result);
+    };
+    reader.readAsDataURL(blob);
+});
 
 export default Map;
