@@ -92,9 +92,9 @@ class Map extends Component {
                         <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
                             <Icon circular inverted color='teal' name='hotel'/>
                         </Button>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                            <Icon circular inverted color='teal' name='hotel'/>
-                        </Button>
+                        {/*<Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>*/}
+                        {/*    <Icon circular inverted color='teal' name='hotel'/>*/}
+                        {/*</Button>*/}
                     </Grid.Column>
                     {/* <Grid.Column key={2}>
                         <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
@@ -185,7 +185,7 @@ class Map extends Component {
         });
     };
 
-    getDirections = () => {
+    getDirections = (lng, lat) => {
 
         const params = {
             access_token: TOKEN,
@@ -193,15 +193,11 @@ class Map extends Component {
             overview: 'full'
         };
 
-        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.currentLocation.longitude + ',' + this.currentLocation.latitude + ';29.7712492,62.59938889999999');
-        // const url = new URL('https://api.mapbox.com/directions/v5/mapbox/walking/' + '29.768538,62.592495;29.76742, 62.594139');
+        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.currentLocation.longitude + ',' + this.currentLocation.latitude + ';' + lng + ',' + lat);
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
         fetch(url).then(res => res.json())
             .then((response)=>{
-                console.log(response);
-                // const path = _.map(response.waypoints, 'location');
-                // const path = _.map(response.routes, 'geometry.coordinates');
                 const path = response.routes[0].geometry.coordinates;
 
                 const data = [{
@@ -253,7 +249,7 @@ class Map extends Component {
                         {/*        </CardLink>*/}
                         {/*    </div>*/}
 
-                           <Places data={this.state.data}/>
+                           <Places getDirection={this.getDirections} data={this.state.data}/>
                         {/*</div>*/}
                     </Drawer>
 
@@ -268,7 +264,8 @@ class Map extends Component {
                             viewState={viewport}
                             layers={layer}
                         />
-                        {/*{this.loadMarkers()}*/}
+
+                        {this.loadMarkers()}
 
                         {/*<GeolocateControl*/}
                         {/*    style={style}*/}
