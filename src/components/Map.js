@@ -81,26 +81,36 @@ class Map extends Component {
         return (
             <Container style={{ padding: '1em' }}>
                 <Header as='h3'>Search this area</Header>
-                <Grid.Column key={1}>
-                    <Button icon color='teal' onClick={() => {
-                        this.getDirections();
-                        // this.getPlace();
-                        // this.getPlacePhoto();
-                    }}>
-                        <Icon circular inverted color='teal' name='food'/>
-                    </Button>
-                </Grid.Column>
-
-                <PlaceDetails data={this.state.place} image={this.state.image}/>
+                <Grid>
+                    <Grid.Column key={1}>
+                        <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                            <Icon circular inverted color='teal' name='food'/>
+                        </Button>
+                        <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                            <Icon circular inverted color='teal' name='coffee'/>
+                        </Button>
+                        <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
+                            <Icon circular inverted color='teal' name='hotel'/>
+                        </Button>
+                        <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                            <Icon circular inverted color='teal' name='hotel'/>
+                        </Button>
+                    </Grid.Column>
+                    {/* <Grid.Column key={2}>
+                        <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                            <Icon circular inverted color='red' name='food'/>
+                        </Button>
+                    </Grid.Column> */}
+                </Grid>
             </Container>
         );
     };
 
-    searchRestaurant = () => {
+    searchByKeyword = (keyword) => {
         const params = {
             location: this.currentLocation.latitude + ',' + this.currentLocation.longitude,
-            radius: 1000,
-            type: 'restaurant',
+            radius: 2000,
+            type: keyword,
             key: GOOGLE_API_KEY
         };
 
@@ -229,7 +239,7 @@ class Map extends Component {
                 }}>
 
                     <Drawer
-                        width="20vw"
+                        width="25vw"
                         getContainer={null}
                         showMask={false}
                         defaultOpen={true}
@@ -243,7 +253,7 @@ class Map extends Component {
                         {/*        </CardLink>*/}
                         {/*    </div>*/}
 
-                        {/*    <Places data={this.state.data}/>*/}
+                           <Places data={this.state.data}/>
                         {/*</div>*/}
                     </Drawer>
 
