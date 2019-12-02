@@ -1,12 +1,15 @@
 import React,{ Component } from 'react'
-import MapGL, { GeolocateControl } from 'react-map-gl'
+import MapGL, { GeolocateControl, Marker } from 'react-map-gl'
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
+import { Container, Header, Grid, Button, Icon } from 'semantic-ui-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 import "rc-drawer/assets/index.css";
-import { CardLink } from 'reactstrap';
 import Places from './Places';
+import _ from 'lodash';
+
+import restaurant from '../assets/images/restaurants.png';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
@@ -30,6 +33,7 @@ class Map extends Component {
             bearing: 0,
             pitch: 0
         },
+        markers: [],
         mounted: false
     };
 
@@ -70,6 +74,19 @@ class Map extends Component {
         });
     }
 
+    loadPanel = () => {
+        return (
+            <Container style={{ padding: '1em' }}>
+                <Header as='h3'>Search this area</Header>
+                <Grid.Column key={1}>
+                    <Button icon color='teal' onClick={this.searchRestaurant}>
+                        <Icon circular inverted color='teal' name='food'/>
+                    </Button>
+                </Grid.Column>
+            </Container>
+        );
+    };
+
     searchRestaurant = () => {
         const params = {
             location: this.currentLocation.latitude + ',' + this.currentLocation.longitude,
@@ -82,10 +99,37 @@ class Map extends Component {
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-               this.setState({
-                   data: data.results
-               })
+                const markers = _.map(data.results, i => _.pick(i, ['geometry.location', 'place_id']));
+
+                this.setState({
+                    data: data.results,
+                    markers: data.results,
+                    viewport: {
+                        width: "100%",
+                        height: 600,
+                        longitude: this.state.viewport.longitude,
+                        latitude: this.state.viewport.latitude,
+                        zoom: 13,
+                        bearing: 0,
+                        pitch: 0
+                    }
+                })
             });
+    };
+
+    loadMarkers = () => {
+        return this.state.markers.map(marker => {
+            return (
+                <Marker
+                    key={marker.place_id}
+                    latitude={parseFloat(marker.geometry.location.lat)}
+                    longitude={parseFloat(marker.geometry.location.lng)}
+                    anchor="bottom"
+                >
+                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={restaurant} alt="" />
+                </Marker>
+            );
+        });
     };
 
     render() {
@@ -105,15 +149,17 @@ class Map extends Component {
                         showMask={false}
                         defaultOpen={true}
                     >
-                        <div className="card">
-                            <div className="card-body">
-                                <CardLink onClick={this.searchRestaurant} href="#">
-                                    <FontAwesomeIcon icon={faCoffee} />
-                                </CardLink>
-                            </div>
+                        {this.loadPanel()}
 
-                            <Places data={this.state.data}/>
-                        </div>
+                        {/*<div className="card">*/}
+                        {/*    <div className="card-body">*/}
+                        {/*        <CardLink onClick={this.searchRestaurant} href="#">*/}
+                        {/*            <FontAwesomeIcon icon={faCoffee} />*/}
+                        {/*        </CardLink>*/}
+                        {/*    </div>*/}
+
+                        {/*    <Places data={this.state.data}/>*/}
+                        {/*</div>*/}
                     </Drawer>
 
                     <MapGL
@@ -123,6 +169,8 @@ class Map extends Component {
                         onViewportChange={this.handleViewportChange}
                         mapboxApiAccessToken={TOKEN}
                     >
+
+                        {this.loadMarkers()}
 
                         <GeolocateControl
                             style={style}
