@@ -4,13 +4,15 @@ import DeckGL, {ArcLayer, PathLayer} from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
 import { Container, Header, Grid, Button, Icon } from 'semantic-ui-react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
 
 import restaurant from '../assets/images/restaurants.png';
+import hotels from '../assets/images/hotels.png';
+import shopping from '../assets/images/shopping.png';
+import coffee from '../assets/images/coffee-n-tea.png';
+import place from '../assets/images/default.png';
 import PlaceDetails from './PlaceDetails';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
@@ -37,7 +39,9 @@ class Map extends Component {
         },
         layer: null,
         markers: [],
-        mounted: false
+        mounted: false,
+        search: true,
+        details: false
     };
 
     currentLocation = {
@@ -78,32 +82,61 @@ class Map extends Component {
     }
 
     loadPanel = () => {
+        const search = this.state.search;
+        const details = this.state.details;
+
         return (
             <Container style={{ padding: '1em' }}>
                 <Header as='h3'>Search this area</Header>
-                <Grid>
-                    <Grid.Column key={1}>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
-                            <Icon circular inverted color='teal' name='food'/>
-                        </Button>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                            <Icon circular inverted color='teal' name='coffee'/>
-                        </Button>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
-                            <Icon circular inverted color='teal' name='hotel'/>
-                        </Button>
-                        {/*<Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>*/}
-                        {/*    <Icon circular inverted color='teal' name='hotel'/>*/}
-                        {/*</Button>*/}
-                    </Grid.Column>
-                    {/* <Grid.Column key={2}>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                            <Icon circular inverted color='red' name='food'/>
-                        </Button>
-                    </Grid.Column> */}
-                </Grid>
+                {
+                    search && (
+                    <Grid>
+                        <Grid.Column>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                                <Icon circular inverted color='teal' name='food'/>
+                            </Button>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                                <Icon circular inverted color='teal' name='coffee'/>
+                            </Button>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
+                                <Icon circular inverted color='teal' name='hotel'/>
+                            </Button>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                <Icon circular inverted color='teal' name='shopping cart'/>
+                            </Button>
+                        </Grid.Column>
+                    </Grid>)
+                }
+
+                {
+                    details && (
+                        <PlaceDetails data={this.state.place} image={this.state.image}/>
+                    )
+                }
+
+                {
+                    !details && !search && (
+                        <Places getDirection={this.getDirections} getPlace={this.getPlace} getPlacePhoto={this.getPlacePhoto} data={this.state.data}/>
+                    )
+                }
+
             </Container>
         );
+    };
+
+    loadMarkers = () => {
+        return this.state.markers.map(marker => {
+            return (
+                <Marker
+                    key={marker.place_id}
+                    latitude={parseFloat(marker.geometry.location.lat)}
+                    longitude={parseFloat(marker.geometry.location.lng)}
+                    anchor="bottom"
+                >
+                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
+                </Marker>
+            );
+        });
     };
 
     searchByKeyword = (keyword) => {
@@ -114,10 +147,41 @@ class Map extends Component {
             key: GOOGLE_API_KEY
         };
 
+        let icon = '';
+        switch (keyword) {
+            case 'restaurant': {
+                icon = restaurant;
+                break;
+            }
+
+            case 'cafe': {
+                icon = coffee;
+                break;
+            }
+
+            case 'lodging': {
+                icon = hotels;
+                break;
+            }
+
+            case 'grocery_or_supermarket': {
+                icon = shopping;
+                break;
+            }
+
+            default: {
+                icon = place;
+                break;
+            }
+        }
+
         const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
+
+                data.results.forEach(result => result.icon = icon);
+
                 this.setState({
                     data: data.results,
                     markers: data.results,
@@ -129,14 +193,15 @@ class Map extends Component {
                         zoom: 13,
                         bearing: 0,
                         pitch: 0
-                    }
+                    },
+                    search: false
                 })
             });
     };
 
-    getPlace = () => {
+    getPlace = (id) => {
         const params = {
-            place_id: 'ChIJBbYqR32Gm0YR4oy5Ekc8wOw',
+            place_id: id,
             key: GOOGLE_API_KEY,
         };
 
@@ -146,14 +211,17 @@ class Map extends Component {
         fetch(url).then(res => res.json())
             .then((data)=>{
                this.setState({
-                   place: data.result.name
-               })
+                   place: data.result,
+                   details: true
+               });
+
+               // this.getPlacePhoto()
             });
     };
 
-    getPlacePhoto = () => {
+    getPlacePhoto = (reference) => {
         const params = {
-            photoreference: 'CmRaAAAAzGaOKh78YOpMVW4_JrYZ0TekPgwLezGqA_DT6y0scnPd1aOe2yZrA13_8SPXvriaJgF-LeEiGeRZ61RlIFmUgv1k0CM9DpE50ARXs-a6xIuDktKQEEoh7CmBx_AYoTuxEhCasnQkd9cKKpat8ywrX0yOGhRWbCaUnorszJ5OKHOxa9sPBSFgog',
+            photoreference: reference,
             maxwidth: 400,
             key: GOOGLE_API_KEY,
         };
@@ -168,21 +236,6 @@ class Map extends Component {
                     image: image
                 });
             });
-    };
-
-    loadMarkers = () => {
-        return this.state.markers.map(marker => {
-            return (
-                <Marker
-                    key={marker.place_id}
-                    latitude={parseFloat(marker.geometry.location.lat)}
-                    longitude={parseFloat(marker.geometry.location.lng)}
-                    anchor="bottom"
-                >
-                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={restaurant} alt="" />
-                </Marker>
-            );
-        });
     };
 
     getDirections = (lng, lat) => {
@@ -248,8 +301,6 @@ class Map extends Component {
                         {/*            <FontAwesomeIcon icon={faCoffee} />*/}
                         {/*        </CardLink>*/}
                         {/*    </div>*/}
-
-                           <Places getDirection={this.getDirections} data={this.state.data}/>
                         {/*</div>*/}
                     </Drawer>
 
@@ -283,7 +334,7 @@ class Map extends Component {
 }
 
 const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
-    const reader = new FileReader;
+    const reader = new FileReader();
     reader.onerror = reject;
     reader.onload = () => {
         resolve(reader.result);

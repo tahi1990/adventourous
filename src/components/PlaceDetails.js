@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { Container, Header, Image } from 'semantic-ui-react'
 
 class PlaceDetails extends PureComponent {
 
@@ -7,10 +8,10 @@ class PlaceDetails extends PureComponent {
         const image = this.props.image;
 
         return(
-            <div>
-                <img src={image}/>
-                <h2>{data}</h2>
-            </div>
+            <Container>
+                <Image src={image} fluid />
+                <Header as='h3'>{data.name}</Header>
+            </Container>
         );
     }
 
