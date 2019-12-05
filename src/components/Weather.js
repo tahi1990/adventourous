@@ -1,6 +1,5 @@
 import React, { PureComponent, Component } from 'react'
 import { Icon, CardContent } from 'semantic-ui-react'
-import WeatherService from '../services/WeatherService';
 import { Collapse } from 'antd';
 import { Card, Feed } from 'semantic-ui-react'
 import { string } from 'prop-types';
