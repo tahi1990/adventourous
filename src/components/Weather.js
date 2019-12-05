@@ -1,12 +1,9 @@
 import React, { PureComponent, Component } from 'react'
 import { Icon, CardContent } from 'semantic-ui-react'
-import { Collapse } from 'antd';
 import { Card, Feed } from 'semantic-ui-react'
 import { string } from 'prop-types';
 
 const OPEN_WEATHER_URL = 'http://openweathermap.org/img/wn/'
-const { Panel } = Collapse;
-
 class Weather extends PureComponent{
     getWeatherIcon(icon){
         return OPEN_WEATHER_URL + icon + '@2x.png'

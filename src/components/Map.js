@@ -99,7 +99,7 @@ class Map extends Component {
 
         return (
             <Container style={{ padding: '1em' }}>
-                <Header as='h3'>Search this area</Header>
+                {/*<Header as='h3'>Search this area</Header>*/}
                 {
                     search && (
                     <Grid>
@@ -122,13 +122,13 @@ class Map extends Component {
 
                 {
                     details && (
-                        <PlaceDetails data={this.state.place} image={this.state.image}/>
+                        <PlaceDetails data={this.state.place} image={this.state.image} direction={this.state.direction}/>
                     )
                 }
 
                 {
                     !details && !search && (
-                        <Places getDirection={this.getDirections} getPlace={this.getPlace} getPlacePhoto={this.getPlacePhoto} data={this.state.data}/>
+                        <Places getDirection={this.getDirections} getPlace={this.getPlace} data={this.state.data}/>
                     )
                 }
 
@@ -231,23 +231,7 @@ class Map extends Component {
             });
     };
 
-    loadMarkers = () => {
-        return this.state.markers.map(marker => {
-            console.log(marker.img)
-            return (
-                <Marker
-                    key={marker.place_id}
-                    latitude={parseFloat(marker.geometry.location.lat)}
-                    longitude={parseFloat(marker.geometry.location.lng)}
-                    anchor="bottom"
-                >
-                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.img} alt="" />
-                </Marker>
-            );
-        });
-    }
-    
-    getPlace = (id) => {
+    requestPlace = (id) => {
         const params = {
             place_id: id,
             key: GOOGLE_API_KEY,
@@ -257,16 +241,19 @@ class Map extends Component {
         const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json');
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
-        fetch(url).then(res => res.json())
-            .then((data)=>{
-               this.setState({
-                   place: data.result,
-                   markers: [data.result],
-                   details: true
-               });
+        return fetch(url).then(res => res.json());
+    };
+    
+    getPlace = (id) => {
+        this.requestPlace(id).then((data)=>{
+           this.setState({
+               place: data.result,
+               markers: [data.result],
+               details: true
+           });
 
-               // this.getPlacePhoto()
-            });
+           // this.getPlacePhoto()
+        });
     };
 
     getPlacePhoto = (reference) => {
@@ -293,7 +280,9 @@ class Map extends Component {
         const params = {
             access_token: TOKEN,
             geometries: 'geojson',
-            overview: 'full'
+            overview: 'full',
+            steps: true,
+            language: 'en'
         };
 
         const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.state.currentLocation.longitude + ',' + this.state.currentLocation.latitude + ';' + lng + ',' + lat);
@@ -301,7 +290,6 @@ class Map extends Component {
 
         fetch(url).then(res => res.json())
             .then((response) => {
-                console.log(response);
                 const path = response.routes[0].geometry.coordinates;
 
                 const start = [{
@@ -356,7 +344,8 @@ class Map extends Component {
                 ];
 
                 this.setState({
-                    layer: layer
+                    layer: layer,
+                    direction: response.routes[0].legs
                 });
             });
 

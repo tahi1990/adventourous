@@ -14,9 +14,6 @@ class Places extends PureComponent {
         return (
             <Item key={place.id} onClick={() => {
                 this.props.getPlace(place.place_id);
-                if(place.photos && place.photos.length > 0) {
-                    this.props.getPlacePhoto(place.photos[0].photo_reference);
-                }
                 this.props.getDirection(place.geometry.location.lng, place.geometry.location.lat);
             }}>
                 <Item.Image size='tiny' src={img} />
