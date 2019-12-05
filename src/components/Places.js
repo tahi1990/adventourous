@@ -63,8 +63,6 @@ class Places extends PureComponent {
             );
         }
     }
-
-
 }
 
 export default Places;

@@ -8,11 +8,14 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
+import Weather from './Weather';
 
 import restaurant from '../assets/images/restaurants.png';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
+const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14'
+const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
 
 const style = {
     position: 'absolute',
@@ -70,14 +73,20 @@ class Map extends Component {
                 longitude: position.coords.longitude,
                 latitude: position.coords.latitude,
             };
-
+            
+            // if(position.coords.latitude > 0 || 
+            //     position.coords.longitude > 0)
+            //     this.loadWeatherData(position.coords.latitude, position.coords.longitude)
         });
     }
 
     loadPanel = () => {
         return (
             <Container style={{ padding: '1em' }}>
-                <Header as='h3'>Search this area</Header>
+                {/* {(this.state.weatherData) && (
+                    <Weather data={this.state.weatherData} />
+                )} */}
+                <Weather />
                 <Grid>
                     <Grid.Column key={1}>
                         <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
@@ -93,11 +102,6 @@ class Map extends Component {
                             <Icon circular inverted color='teal' name='hotel'/>
                         </Button>
                     </Grid.Column>
-                    {/* <Grid.Column key={2}>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                            <Icon circular inverted color='red' name='food'/>
-                        </Button>
-                    </Grid.Column> */}
                 </Grid>
             </Container>
         );
@@ -117,6 +121,7 @@ class Map extends Component {
             .then((data)=>{
                 const markers = _.map(data.results, i => _.pick(i, ['geometry.location', 'place_id']));
                 //console.log(markers[0].photos[0].photo_reference)
+                
                 this.setState({
                     data: data.results,
                     markers: data.results,
@@ -133,8 +138,30 @@ class Map extends Component {
             });
     };
 
+    loadWeatherData = (lat,long) => {
+        const params = {
+            lat: lat,
+            lon: long,
+            units: 'metric',
+            appid: OPEN_WEATHER_API_KEY
+        };
+
+        const url = new URL(OPEN_WEATHER_API_URL);
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        fetch(url).then(res => res.json())
+            .then((data)=>{
+                if(data.cod === 200)
+                {
+                    this.setState({
+                        weatherData: data
+                    })
+                }
+            });
+    };
+
     loadMarkers = () => {
         return this.state.markers.map(marker => {
+            console.log(marker.img)
             return (
                 <Marker
                     key={marker.place_id}
@@ -142,7 +169,7 @@ class Map extends Component {
                     longitude={parseFloat(marker.geometry.location.lng)}
                     anchor="bottom"
                 >
-                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={restaurant} alt="" />
+                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.img} alt="" />
                 </Marker>
             );
         });
@@ -173,7 +200,6 @@ class Map extends Component {
                         {/*            <FontAwesomeIcon icon={faCoffee} />*/}
                         {/*        </CardLink>*/}
                         {/*    </div>*/}
-
                            <Places data={this.state.data}/>
                         {/*</div>*/}
                     </Drawer>
