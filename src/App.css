@@ -40,3 +40,8 @@
   text-transform: uppercase;
   outline: none;
 }
+
+.item .header {
+  border: none;
+  padding: 0;
+}

@@ -1,16 +1,20 @@
 import React,{ Component } from 'react'
-import MapGL, { GeolocateControl, Marker } from 'react-map-gl'
+import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl } from 'react-map-gl'
+import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
 import { Container, Header, Grid, Button, Icon } from 'semantic-ui-react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
 import Weather from './Weather';
 
 import restaurant from '../assets/images/restaurants.png';
+import hotels from '../assets/images/hotels.png';
+import shopping from '../assets/images/shopping.png';
+import coffee from '../assets/images/coffee-n-tea.png';
+import place from '../assets/images/default.png';
+import PlaceDetails from './PlaceDetails';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
@@ -19,9 +23,23 @@ const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
 
 const style = {
     position: 'absolute',
-    bottom: 0,
+    bottom: 115,
     right: 0,
     margin: 10
+};
+
+const fullscreenControlStyle = {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: '10px'
+};
+
+const navStyle = {
+    position: 'absolute',
+    bottom: 15,
+    right: 0,
+    padding: '10px'
 };
 
 class Map extends Component {
@@ -36,12 +54,12 @@ class Map extends Component {
             bearing: 0,
             pitch: 0
         },
+        layer: null,
         markers: [],
-        mounted: false
-    };
-
-    currentLocation = {
-
+        currentLocation: null,
+        mounted: false,
+        search: true,
+        details: false
     };
 
     mapRef = React.createRef();
@@ -63,65 +81,118 @@ class Map extends Component {
                     height: 600,
                     longitude: position.coords.longitude,
                     latitude: position.coords.latitude,
-                    zoom: 10,
+                    zoom: 13,
                     bearing: 0,
                     pitch: 0
                 },
+                currentLocation: {
+                    longitude: position.coords.longitude,
+                    latitude: position.coords.latitude,
+                }
             });
-
-            this.currentLocation = {
-                longitude: position.coords.longitude,
-                latitude: position.coords.latitude,
-            };
-            
-            // if(position.coords.latitude > 0 || 
-            //     position.coords.longitude > 0)
-            //     this.loadWeatherData(position.coords.latitude, position.coords.longitude)
         });
     }
 
     loadPanel = () => {
+        const search = this.state.search;
+        const details = this.state.details;
+
         return (
             <Container style={{ padding: '1em' }}>
-                {/* {(this.state.weatherData) && (
-                    <Weather data={this.state.weatherData} />
-                )} */}
-                <Weather />
-                <Grid>
-                    <Grid.Column key={1}>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
-                            <Icon circular inverted color='teal' name='food'/>
-                        </Button>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                            <Icon circular inverted color='teal' name='coffee'/>
-                        </Button>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
-                            <Icon circular inverted color='teal' name='hotel'/>
-                        </Button>
-                        <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                            <Icon circular inverted color='teal' name='hotel'/>
-                        </Button>
-                    </Grid.Column>
-                </Grid>
+                <Header as='h3'>Search this area</Header>
+                {
+                    search && (
+                    <Grid>
+                        <Grid.Column>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                                <Icon circular inverted color='teal' name='food'/>
+                            </Button>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                                <Icon circular inverted color='teal' name='coffee'/>
+                            </Button>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
+                                <Icon circular inverted color='teal' name='hotel'/>
+                            </Button>
+                            <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                <Icon circular inverted color='teal' name='shopping cart'/>
+                            </Button>
+                        </Grid.Column>
+                    </Grid>)
+                }
+
+                {
+                    details && (
+                        <PlaceDetails data={this.state.place} image={this.state.image}/>
+                    )
+                }
+
+                {
+                    !details && !search && (
+                        <Places getDirection={this.getDirections} getPlace={this.getPlace} getPlacePhoto={this.getPlacePhoto} data={this.state.data}/>
+                    )
+                }
+
             </Container>
         );
     };
 
+    loadMarkers = () => {
+        return this.state.markers.map(marker => {
+            return (
+                <Marker
+                    key={marker.place_id}
+                    latitude={parseFloat(marker.geometry.location.lat)}
+                    longitude={parseFloat(marker.geometry.location.lng)}
+                >
+                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
+                </Marker>
+            );
+        });
+    };
+
     searchByKeyword = (keyword) => {
         const params = {
-            location: this.currentLocation.latitude + ',' + this.currentLocation.longitude,
+            location: this.state.currentLocation.latitude + ',' + this.state.currentLocation.longitude,
             radius: 2000,
             type: keyword,
             key: GOOGLE_API_KEY
         };
 
+        let icon = '';
+        switch (keyword) {
+            case 'restaurant': {
+                icon = restaurant;
+                break;
+            }
+
+            case 'cafe': {
+                icon = coffee;
+                break;
+            }
+
+            case 'lodging': {
+                icon = hotels;
+                break;
+            }
+
+            case 'grocery_or_supermarket': {
+                icon = shopping;
+                break;
+            }
+
+            default: {
+                icon = place;
+                break;
+            }
+        }
+
         const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-                const markers = _.map(data.results, i => _.pick(i, ['geometry.location', 'place_id']));
-                //console.log(markers[0].photos[0].photo_reference)
-                
+
+                data.results.forEach(result => result.icon = icon);
+
                 this.setState({
                     data: data.results,
                     markers: data.results,
@@ -133,7 +204,8 @@ class Map extends Component {
                         zoom: 13,
                         bearing: 0,
                         pitch: 0
-                    }
+                    },
+                    search: false
                 })
             });
     };
@@ -173,10 +245,136 @@ class Map extends Component {
                 </Marker>
             );
         });
+    }
+    
+    getPlace = (id) => {
+        const params = {
+            place_id: id,
+            key: GOOGLE_API_KEY,
+            language: 'en'
+        };
+
+        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        fetch(url).then(res => res.json())
+            .then((data)=>{
+               this.setState({
+                   place: data.result,
+                   markers: [data.result],
+                   details: true
+               });
+
+               // this.getPlacePhoto()
+            });
+    };
+
+    getPlacePhoto = (reference) => {
+        const params = {
+            photoreference: reference,
+            maxwidth: 400,
+            key: GOOGLE_API_KEY,
+        };
+
+        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        fetch(url).then(res => res.blob())
+            .then(convertBlobToBase64)
+            .then(image => {
+                this.setState({
+                    image: image
+                });
+            });
+    };
+
+    getDirections = (lng, lat) => {
+
+        const params = {
+            access_token: TOKEN,
+            geometries: 'geojson',
+            overview: 'full'
+        };
+
+        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.state.currentLocation.longitude + ',' + this.state.currentLocation.latitude + ';' + lng + ',' + lat);
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        fetch(url).then(res => res.json())
+            .then((response) => {
+                console.log(response);
+                const path = response.routes[0].geometry.coordinates;
+
+                const start = [{
+                    name: "start",
+                    color: [169, 169, 169],
+                    path: [
+                        [this.state.currentLocation.longitude, this.state.currentLocation.latitude],
+                        path[0]
+                    ]
+                }];
+
+                const data = [{
+                    name: "random-name",
+                    color: [101, 147, 245],
+                    path: path
+                }];
+
+                const end = [{
+                    name: "end",
+                    color: [169, 169, 169],
+                    path: [
+                        path[path.length - 1],
+                        [lng, lat]
+                    ]
+                }];
+
+                const layer = [
+                    new PathLayer({
+                        id: "start-layer",
+                        data: start,
+                        getWidth: data => 4,
+                        getColor: data => data.color,
+                        widthMinPixels: 4,
+                        rounded: true
+                    }),
+                    new PathLayer({
+                        id: "path-layer",
+                        data,
+                        getWidth: data => 4,
+                        getColor: data => data.color,
+                        widthMinPixels: 4,
+                        rounded: true
+                    }),
+                    new PathLayer({
+                        id: "end-layer",
+                        data: end,
+                        getWidth: data => 4,
+                        getColor: data => data.color,
+                        widthMinPixels: 4,
+                        rounded: true
+                    }),
+                ];
+
+                this.setState({
+                    layer: layer
+                });
+            });
+
+    };
+
+    onClickGeolocate = (event) => {
+        console.log('Update location');
+
+        this.setState({
+            currentLocation: {
+                longitude: event.viewState.longitude,
+                latitude: event.viewState.latitude,
+            }
+        })
     };
 
     render() {
-        const { viewport } = this.state;
+        const { viewport, layer } = this.state;
 
         return(
             <SiteWrapper>
@@ -200,7 +398,6 @@ class Map extends Component {
                         {/*            <FontAwesomeIcon icon={faCoffee} />*/}
                         {/*        </CardLink>*/}
                         {/*    </div>*/}
-                           <Places data={this.state.data}/>
                         {/*</div>*/}
                     </Drawer>
 
@@ -211,14 +408,35 @@ class Map extends Component {
                         onViewportChange={this.handleViewportChange}
                         mapboxApiAccessToken={TOKEN}
                     >
+                        <DeckGL
+                            viewState={viewport}
+                            layers={layer}
+                        />
 
                         {this.loadMarkers()}
 
+                        { this.state.currentLocation && (
+                            <Marker
+                                ref={this.mapRef}
+                                className="mapboxgl-user-location-dot"
+                                longitude={this.state.currentLocation.longitude}
+                                latitude={this.state.currentLocation.latitude}
+                            />
+                        )}
+
                         <GeolocateControl
                             style={style}
+                            onViewStateChange={this.onClickGeolocate}
                             positionOptions={{enableHighAccuracy: true}}
                             trackUserLocation={true}
                         />
+
+                        <div className="fullscreen" style={fullscreenControlStyle}>
+                            <FullscreenControl />
+                        </div>
+                        <div className="nav" style={navStyle}>
+                            <NavigationControl />
+                        </div>
 
                     </MapGL>
                 </div>
@@ -228,5 +446,14 @@ class Map extends Component {
     }
 
 }
+
+const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+        resolve(reader.result);
+    };
+    reader.readAsDataURL(blob);
+});
 
 export default Map;
