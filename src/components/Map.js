@@ -3,11 +3,13 @@ import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl }
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
-import { Container, Header, Grid, Button, Icon } from 'semantic-ui-react'
+import { Container, Grid, Button, Icon } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
 import Weather from './Weather';
+
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 import restaurant from '../assets/images/restaurants.png';
 import hotels from '../assets/images/hotels.png';
@@ -59,7 +61,8 @@ class Map extends Component {
         currentLocation: null,
         mounted: false,
         search: true,
-        details: false
+        details: false,
+        place_search_id: '',
     };
 
     mapRef = React.createRef();
@@ -90,7 +93,18 @@ class Map extends Component {
                     latitude: position.coords.latitude,
                 }
             });
+
+            if(position.coords.latitude > 0 || position.coords.longitude > 0)
+            {
+                console.log('did mount')
+                this.loadWeatherData(position.coords.latitude, position.coords.longitude)
+            }
+
         });
+    }
+
+    handleSearch = (place_id) => {
+        
     }
 
     loadPanel = () => {
@@ -99,7 +113,16 @@ class Map extends Component {
 
         return (
             <Container style={{ padding: '1em' }}>
-                <Header as='h3'>Search this area</Header>
+                {
+                    this.state.weatherData &&
+                    (<Weather data={this.state.weatherData} />
+                )}
+                {console.log(this.state.weatherData)}
+                <GooglePlacesAutocomplete
+                    onSelect={({ place_id }) => (
+                        this.handleSearch(place_id)
+                      )}
+                />
                 {
                     search && (
                     <Grid>
@@ -246,7 +269,7 @@ class Map extends Component {
             );
         });
     }
-    
+
     getPlace = (id) => {
         const params = {
             place_id: id,
@@ -377,6 +400,7 @@ class Map extends Component {
         const { viewport, layer } = this.state;
 
         return(
+            <div>
             <SiteWrapper>
                 <div style={{
                     position: "relative",
@@ -391,7 +415,7 @@ class Map extends Component {
                         defaultOpen={true}
                     >
                         {this.loadPanel()}
-
+                        {console.log(this.state)}
                         {/*<div className="card">*/}
                         {/*    <div className="card-body">*/}
                         {/*        <CardLink onClick={this.searchRestaurant} href="#">*/}
@@ -440,8 +464,8 @@ class Map extends Component {
 
                     </MapGL>
                 </div>
-
             </SiteWrapper>
+            </div>
         )
     }
 
