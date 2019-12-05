@@ -1,6 +1,6 @@
 import React,{ Component } from 'react'
-import MapGL, {_MapContext as MapContext, GeolocateControl, Marker} from 'react-map-gl'
-import DeckGL, {ArcLayer, PathLayer} from "deck.gl";
+import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl } from 'react-map-gl'
+import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
 import { Container, Header, Grid, Button, Icon } from 'semantic-ui-react'
@@ -20,9 +20,23 @@ const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 
 const style = {
     position: 'absolute',
-    bottom: 0,
+    bottom: 115,
     right: 0,
     margin: 10
+};
+
+const fullscreenControlStyle = {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: '10px'
+};
+
+const navStyle = {
+    position: 'absolute',
+    bottom: 15,
+    right: 0,
+    padding: '10px'
 };
 
 class Map extends Component {
@@ -39,13 +53,10 @@ class Map extends Component {
         },
         layer: null,
         markers: [],
+        currentLocation: null,
         mounted: false,
         search: true,
         details: false
-    };
-
-    currentLocation = {
-
     };
 
     mapRef = React.createRef();
@@ -71,13 +82,11 @@ class Map extends Component {
                     bearing: 0,
                     pitch: 0
                 },
+                currentLocation: {
+                    longitude: position.coords.longitude,
+                    latitude: position.coords.latitude,
+                }
             });
-
-            this.currentLocation = {
-                longitude: position.coords.longitude,
-                latitude: position.coords.latitude,
-            };
-
         });
     }
 
@@ -131,7 +140,6 @@ class Map extends Component {
                     key={marker.place_id}
                     latitude={parseFloat(marker.geometry.location.lat)}
                     longitude={parseFloat(marker.geometry.location.lng)}
-                    anchor="bottom"
                 >
                     <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
                 </Marker>
@@ -141,7 +149,7 @@ class Map extends Component {
 
     searchByKeyword = (keyword) => {
         const params = {
-            location: this.currentLocation.latitude + ',' + this.currentLocation.longitude,
+            location: this.state.currentLocation.latitude + ',' + this.state.currentLocation.longitude,
             radius: 2000,
             type: keyword,
             key: GOOGLE_API_KEY
@@ -203,6 +211,7 @@ class Map extends Component {
         const params = {
             place_id: id,
             key: GOOGLE_API_KEY,
+            language: 'en'
         };
 
         const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json');
@@ -212,6 +221,7 @@ class Map extends Component {
             .then((data)=>{
                this.setState({
                    place: data.result,
+                   markers: [data.result],
                    details: true
                });
 
@@ -246,12 +256,22 @@ class Map extends Component {
             overview: 'full'
         };
 
-        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.currentLocation.longitude + ',' + this.currentLocation.latitude + ';' + lng + ',' + lat);
+        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.state.currentLocation.longitude + ',' + this.state.currentLocation.latitude + ';' + lng + ',' + lat);
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
         fetch(url).then(res => res.json())
-            .then((response)=>{
+            .then((response) => {
+                console.log(response);
                 const path = response.routes[0].geometry.coordinates;
+
+                const start = [{
+                    name: "start",
+                    color: [169, 169, 169],
+                    path: [
+                        [this.state.currentLocation.longitude, this.state.currentLocation.latitude],
+                        path[0]
+                    ]
+                }];
 
                 const data = [{
                     name: "random-name",
@@ -259,14 +279,40 @@ class Map extends Component {
                     path: path
                 }];
 
+                const end = [{
+                    name: "end",
+                    color: [169, 169, 169],
+                    path: [
+                        path[path.length - 1],
+                        [lng, lat]
+                    ]
+                }];
+
                 const layer = [
+                    new PathLayer({
+                        id: "start-layer",
+                        data: start,
+                        getWidth: data => 4,
+                        getColor: data => data.color,
+                        widthMinPixels: 4,
+                        rounded: true
+                    }),
                     new PathLayer({
                         id: "path-layer",
                         data,
                         getWidth: data => 4,
                         getColor: data => data.color,
-                        widthMinPixels: 4
-                    })
+                        widthMinPixels: 4,
+                        rounded: true
+                    }),
+                    new PathLayer({
+                        id: "end-layer",
+                        data: end,
+                        getWidth: data => 4,
+                        getColor: data => data.color,
+                        widthMinPixels: 4,
+                        rounded: true
+                    }),
                 ];
 
                 this.setState({
@@ -274,6 +320,17 @@ class Map extends Component {
                 });
             });
 
+    };
+
+    onClickGeolocate = (event) => {
+        console.log('Update location');
+
+        this.setState({
+            currentLocation: {
+                longitude: event.viewState.longitude,
+                latitude: event.viewState.latitude,
+            }
+        })
     };
 
     render() {
@@ -318,11 +375,28 @@ class Map extends Component {
 
                         {this.loadMarkers()}
 
-                        {/*<GeolocateControl*/}
-                        {/*    style={style}*/}
-                        {/*    positionOptions={{enableHighAccuracy: true}}*/}
-                        {/*    trackUserLocation={true}*/}
-                        {/*/>*/}
+                        { this.state.currentLocation && (
+                            <Marker
+                                ref={this.mapRef}
+                                className="mapboxgl-user-location-dot"
+                                longitude={this.state.currentLocation.longitude}
+                                latitude={this.state.currentLocation.latitude}
+                            />
+                        )}
+
+                        <GeolocateControl
+                            style={style}
+                            onViewStateChange={this.onClickGeolocate}
+                            positionOptions={{enableHighAccuracy: true}}
+                            trackUserLocation={true}
+                        />
+
+                        <div className="fullscreen" style={fullscreenControlStyle}>
+                            <FullscreenControl />
+                        </div>
+                        <div className="nav" style={navStyle}>
+                            <NavigationControl />
+                        </div>
 
                     </MapGL>
                 </div>
