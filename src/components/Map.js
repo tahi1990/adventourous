@@ -45,7 +45,6 @@ const navStyle = {
 };
 
 class Map extends Component {
-
     state = {
         viewport :{
             width: "100%",
@@ -61,8 +60,7 @@ class Map extends Component {
         currentLocation: null,
         mounted: false,
         search: true,
-        details: false,
-        place_search_id: '',
+        details: false
     };
 
     mapRef = React.createRef();
@@ -103,15 +101,34 @@ class Map extends Component {
         });
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.id !== prevProps.id) {
+          this.setDefaultTranslation(this.props.viewport)
+        }
+      }
+
     handleSearch = (place_id) => {
+        this.setState({
+            loading: true
+        });
+
         this.requestPlace(place_id).then((data)=>{
                 this.setState({
                     viewport: {
                         latitude: data.result.geometry.location.lat,
-                        longitude: data.result.geometry.location.lng
+                        longitude: data.result.geometry.location.lng,
+                        width: "100%",
+                        height: 600,
+                        zoom: 13,
+                        bearing: 0,
+                        pitch: 0
                     }
                 })
             });
+        this.setState({
+            loading: false
+        })
+        
     }
 
     loadPanel = () => {
