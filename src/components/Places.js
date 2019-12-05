@@ -14,7 +14,7 @@ class Places extends PureComponent {
         return (
             <Item key={place.id} onClick={() => {
                 this.props.getPlace(place.place_id);
-                this.props.getDirection(place.geometry.location.lng, place.geometry.location.lat);
+                this.props.getDirection(place.geometry.location.lng, place.geometry.location.lat, 'driving');
             }}>
                 <Item.Image size='tiny' src={img} />
                 <Item.Content>

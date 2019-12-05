@@ -3,7 +3,7 @@ import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl }
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
-import { Container, Grid, Button, Icon } from 'semantic-ui-react'
+import { Container, Header, Grid, Button, Icon, Dimmer, Loader } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
@@ -60,7 +60,8 @@ class Map extends Component {
         currentLocation: null,
         mounted: false,
         search: true,
-        details: false
+        details: false,
+        loading: false
     };
 
     mapRef = React.createRef();
@@ -92,10 +93,11 @@ class Map extends Component {
                 }
             });
 
-            if(position.coords.latitude > 0 || position.coords.longitude > 0)
+            if(this.state.viewport.latitude > 0 || this.state.viewport.longitude > 0)
             {
                 console.log('did mount')
-                this.loadWeatherData(position.coords.latitude, position.coords.longitude)
+                //this.loadWeatherData(position.coords.latitude, position.coords.longitude)
+                this.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude)
             }
 
         });
@@ -127,7 +129,9 @@ class Map extends Component {
             });
         this.setState({
             loading: false
-        })
+        });
+
+        this.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude);
         
     }
 
@@ -135,8 +139,16 @@ class Map extends Component {
         const search = this.state.search;
         const details = this.state.details;
 
+        const {loading} = this.state;
+
         return (
             <Container style={{ padding: '1em' }}>
+                {/*<Header as='h3'>Search this area</Header>*/}
+
+                <Dimmer inverted active={loading}>
+                    <Loader inverted size='medium'>Loading</Loader>
+                </Dimmer>
+
                 {
                     this.state.weatherData &&
                     (<Weather data={this.state.weatherData} />
@@ -169,7 +181,7 @@ class Map extends Component {
 
                 {
                     details && (
-                        <PlaceDetails data={this.state.place} image={this.state.image} direction={this.state.direction}/>
+                        <PlaceDetails data={this.state.place} image={this.state.image} direction={this.state.direction} getDirection={this.getDirections}/>
                     )
                 }
 
@@ -233,6 +245,10 @@ class Map extends Component {
             }
         }
 
+        this.setState({
+            loading: true
+        });
+
         const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
@@ -252,7 +268,8 @@ class Map extends Component {
                         bearing: 0,
                         pitch: 0
                     },
-                    search: false
+                    search: false,
+                    loading: false
                 })
             });
     };
@@ -269,6 +286,8 @@ class Map extends Component {
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
+                console.log('load weather data')
+                console.log(data)
                 if(data.cod === 200)
                 {
                     this.setState({
@@ -292,11 +311,16 @@ class Map extends Component {
     };
     
     getPlace = (id) => {
+        this.setState({
+            loading: true
+        });
+
         this.requestPlace(id).then((data)=>{
            this.setState({
                place: data.result,
                markers: [data.result],
-               details: true
+               details: true,
+               loading: false
            });
 
            // this.getPlacePhoto()
@@ -322,7 +346,7 @@ class Map extends Component {
             });
     };
 
-    getDirections = (lng, lat) => {
+    getDirections = (lng, lat, type) => {
 
         const params = {
             access_token: TOKEN,
@@ -332,11 +356,16 @@ class Map extends Component {
             language: 'en'
         };
 
-        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/driving/' + this.state.currentLocation.longitude + ',' + this.state.currentLocation.latitude + ';' + lng + ',' + lat);
+        const url = new URL('https://api.mapbox.com/directions/v5/mapbox/' + type + '/' + this.state.currentLocation.longitude + ',' + this.state.currentLocation.latitude + ';' + lng + ',' + lat);
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+        this.setState({
+            loading: true
+        });
 
         fetch(url).then(res => res.json())
             .then((response) => {
+                console.log(response);
                 const path = response.routes[0].geometry.coordinates;
 
                 const start = [{
@@ -392,7 +421,8 @@ class Map extends Component {
 
                 this.setState({
                     layer: layer,
-                    direction: response.routes[0].legs
+                    direction: response.routes[0].legs,
+                    loading: false
                 });
             });
 

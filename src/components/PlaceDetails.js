@@ -7,7 +7,8 @@ const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 class PlaceDetails extends PureComponent {
 
     state = {
-        active: true
+        active: true,
+        type: 'Driving'
     };
 
     handleClick = () => {
@@ -42,25 +43,40 @@ class PlaceDetails extends PureComponent {
             + data.photos[0].photo_reference + '&key='
             + GOOGLE_API_KEY;
 
-        const {active} = this.state;
+        const {active, type} = this.state;
 
         return(
             <Container>
                 <Button.Group basic icon fluid>
-                    <Button active basic color='red'>
+                    <Button active basic color='red' onClick={() => {
+                        this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'driving');
+                        this.setState({
+                            type: 'Driving'
+                        });
+                    }}>
                         <Icon name='car' color='red'/>
                     </Button>
-                    <Button basic color='green'>
+                    <Button basic color='green' onClick={() => {
+                        this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'cycling');
+                        this.setState({
+                            type: 'Cycling'
+                        });
+                    }}>
                         <Icon name='bicycle' color='green' />
                     </Button>
-                    <Button basic color='blue'>
+                    <Button basic color='blue' onClick={() => {
+                        this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'walking');
+                        this.setState({
+                            type: 'Walking'
+                        });
+                    }}>
                         <Icon name='male' color='blue' />
                     </Button>
                 </Button.Group>
                 { direction && (
                     <Accordion>
                         <Accordion.Title active={active} onClick={this.handleClick}>
-                            <Icon name='dropdown' />Driving - {direction[0].duration} ({direction[0].distance + 'm'})
+                            <Icon name='dropdown' />{type} - {direction[0].duration} ({direction[0].distance + 'm'})
                         </Accordion.Title>
                         <Accordion.Content active={active}>
                             <List divided relaxed>
