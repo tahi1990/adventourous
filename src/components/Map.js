@@ -9,6 +9,8 @@ import Places from './Places';
 import _ from 'lodash';
 import Weather from './Weather';
 
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+
 import restaurant from '../assets/images/restaurants.png';
 import hotels from '../assets/images/hotels.png';
 import shopping from '../assets/images/shopping.png';
@@ -91,7 +93,25 @@ class Map extends Component {
                     latitude: position.coords.latitude,
                 }
             });
+
+            if(position.coords.latitude > 0 || position.coords.longitude > 0)
+            {
+                console.log('did mount')
+                this.loadWeatherData(position.coords.latitude, position.coords.longitude)
+            }
+
         });
+    }
+
+    handleSearch = (place_id) => {
+        this.requestPlace(place_id).then((data)=>{
+                this.setState({
+                    viewport: {
+                        latitude: data.result.geometry.location.lat,
+                        longitude: data.result.geometry.location.lng
+                    }
+                })
+            });
     }
 
     loadPanel = () => {
@@ -108,6 +128,16 @@ class Map extends Component {
                     <Loader inverted size='medium'>Loading</Loader>
                 </Dimmer>
 
+                {
+                    this.state.weatherData &&
+                    (<Weather data={this.state.weatherData} />
+                )}
+                {console.log(this.state.weatherData)}
+                <GooglePlacesAutocomplete
+                    onSelect={({ place_id }) => (
+                        this.handleSearch(place_id)
+                      )}
+                />
                 {
                     search && (
                     <Grid>
@@ -390,6 +420,7 @@ class Map extends Component {
         const { viewport, layer } = this.state;
 
         return(
+            <div>
             <SiteWrapper>
                 <div style={{
                     position: "relative",
@@ -404,7 +435,7 @@ class Map extends Component {
                         defaultOpen={true}
                     >
                         {this.loadPanel()}
-
+                        {console.log(this.state)}
                         {/*<div className="card">*/}
                         {/*    <div className="card-body">*/}
                         {/*        <CardLink onClick={this.searchRestaurant} href="#">*/}
@@ -453,8 +484,8 @@ class Map extends Component {
 
                     </MapGL>
                 </div>
-
             </SiteWrapper>
+            </div>
         )
     }
 
