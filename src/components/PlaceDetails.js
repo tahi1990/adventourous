@@ -73,6 +73,11 @@ class PlaceDetails extends PureComponent {
                         <Icon name='male' color='blue' />
                     </Button>
                 </Button.Group>
+
+                { !direction && (
+                    <Header as='h3'>No route available.</Header>
+                )}
+
                 { direction && (
                     <Accordion>
                         <Accordion.Title active={active} onClick={this.handleClick}>

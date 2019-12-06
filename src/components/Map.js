@@ -3,11 +3,12 @@ import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl }
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
-import { Container, Header, Grid, Button, Icon, Dimmer, Loader } from 'semantic-ui-react'
+import { Container, Header, Grid, Button, Icon, Dimmer, Loader, Divider } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
 import Weather from './Weather';
+import loader from '../assets/loader.svg';
 
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
@@ -110,25 +111,29 @@ class Map extends Component {
       }
 
     handleSearch = (place_id) => {
-        const curThis = this
+        const curThis = this;
+        curThis.setState({
+            loading: true
+        });
+
         this.requestPlace(place_id).then((data)=>{
-                console.log(data)
-                curThis.setState({
-                    viewport: {
-                        latitude: data.result.geometry.location.lat,
-                        longitude: data.result.geometry.location.lng,
-                        width: "100%",
-                        height: 600,
-                        zoom: 13,
-                        bearing: 0,
-                        pitch: 0
-                    }
-                })
-                curThis.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude)
+            curThis.setState({
+                viewport: {
+                    latitude: data.result.geometry.location.lat,
+                    longitude: data.result.geometry.location.lng,
+                    width: "100%",
+                    height: 600,
+                    zoom: 13,
+                    bearing: 0,
+                    pitch: 0
+                },
+                loading: false
             });
+            curThis.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude)
+        });
         
         
-    }
+    };
 
     loadPanel = () => {
         const search = this.state.search;
@@ -138,41 +143,53 @@ class Map extends Component {
 
         return (
             <Container style={{ padding: '1em' }}>
-                {/*<Header as='h3'>Search this area</Header>*/}
-
                 <Dimmer inverted active={loading}>
                     <Loader inverted size='medium'>Loading</Loader>
                 </Dimmer>
 
-                {
-                    this.state.weatherData &&
-                    (<Weather data={this.state.weatherData} />
+                { this.state.weatherData && (
+                    <Container>
+                        <Weather data={this.state.weatherData} />
+                    </Container>
                 )}
-                {console.log(this.state.weatherData)}
-                <GooglePlacesAutocomplete
-                    onSelect={({ place_id }) => (
-                        this.handleSearch(place_id)
-                      )}
-                />
-                {
-                    search && (
-                    <Grid>
-                        <Grid.Column>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
-                                <Icon circular inverted color='teal' name='food'/>
-                            </Button>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                                <Icon circular inverted color='teal' name='coffee'/>
-                            </Button>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
-                                <Icon circular inverted color='teal' name='hotel'/>
-                            </Button>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                                <Icon circular inverted color='teal' name='shopping cart'/>
-                            </Button>
-                        </Grid.Column>
-                    </Grid>)
-                }
+
+                { search && (
+                    <div>
+                        <Divider horizontal>
+                            <Header as='h4'>
+                                <Icon name='search' />
+                                Search
+                            </Header>
+                        </Divider>
+
+                        <GooglePlacesAutocomplete
+                            placeholder={'Search'}
+                            loader={<img alt="" src={loader} />}
+                            onSelect={({ place_id }) => (
+                                this.handleSearch(place_id)
+                            )}
+                        />
+
+                        <Divider hidden/>
+
+                        <Grid>
+                            <Grid.Column>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                                    <Icon circular inverted color='teal' name='food'/>
+                                </Button>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                                    <Icon circular inverted color='teal' name='coffee'/>
+                                </Button>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
+                                    <Icon circular inverted color='teal' name='hotel'/>
+                                </Button>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                    <Icon circular inverted color='teal' name='shopping cart'/>
+                                </Button>
+                            </Grid.Column>
+                        </Grid>
+                    </div>
+                    )}
 
                 {
                     details && (
@@ -206,7 +223,7 @@ class Map extends Component {
 
     searchByKeyword = (keyword) => {
         const params = {
-            location: this.state.currentLocation.latitude + ',' + this.state.currentLocation.longitude,
+            location: this.state.viewport.latitude + ',' + this.state.viewport.longitude,
             radius: 2000,
             type: keyword,
             key: GOOGLE_API_KEY
@@ -322,25 +339,6 @@ class Map extends Component {
         });
     };
 
-    getPlacePhoto = (reference) => {
-        const params = {
-            photoreference: reference,
-            maxwidth: 400,
-            key: GOOGLE_API_KEY,
-        };
-
-        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo');
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-        fetch(url).then(res => res.blob())
-            .then(convertBlobToBase64)
-            .then(image => {
-                this.setState({
-                    image: image
-                });
-            });
-    };
-
     getDirections = (lng, lat, type) => {
 
         const params = {
@@ -360,65 +358,70 @@ class Map extends Component {
 
         fetch(url).then(res => res.json())
             .then((response) => {
-                console.log(response);
-                const path = response.routes[0].geometry.coordinates;
+                if(response.routes > 0) {
+                    const path = response.routes[0].geometry.coordinates;
 
-                const start = [{
-                    name: "start",
-                    color: [169, 169, 169],
-                    path: [
-                        [this.state.currentLocation.longitude, this.state.currentLocation.latitude],
-                        path[0]
-                    ]
-                }];
+                    const start = [{
+                        name: "start",
+                        color: [169, 169, 169],
+                        path: [
+                            [this.state.currentLocation.longitude, this.state.currentLocation.latitude],
+                            path[0]
+                        ]
+                    }];
 
-                const data = [{
-                    name: "random-name",
-                    color: [101, 147, 245],
-                    path: path
-                }];
+                    const data = [{
+                        name: "random-name",
+                        color: [101, 147, 245],
+                        path: path
+                    }];
 
-                const end = [{
-                    name: "end",
-                    color: [169, 169, 169],
-                    path: [
-                        path[path.length - 1],
-                        [lng, lat]
-                    ]
-                }];
+                    const end = [{
+                        name: "end",
+                        color: [169, 169, 169],
+                        path: [
+                            path[path.length - 1],
+                            [lng, lat]
+                        ]
+                    }];
 
-                const layer = [
-                    new PathLayer({
-                        id: "start-layer",
-                        data: start,
-                        getWidth: data => 4,
-                        getColor: data => data.color,
-                        widthMinPixels: 4,
-                        rounded: true
-                    }),
-                    new PathLayer({
-                        id: "path-layer",
-                        data,
-                        getWidth: data => 4,
-                        getColor: data => data.color,
-                        widthMinPixels: 4,
-                        rounded: true
-                    }),
-                    new PathLayer({
-                        id: "end-layer",
-                        data: end,
-                        getWidth: data => 4,
-                        getColor: data => data.color,
-                        widthMinPixels: 4,
-                        rounded: true
-                    }),
-                ];
+                    const layer = [
+                        new PathLayer({
+                            id: "start-layer",
+                            data: start,
+                            getWidth: data => 4,
+                            getColor: data => data.color,
+                            widthMinPixels: 4,
+                            rounded: true
+                        }),
+                        new PathLayer({
+                            id: "path-layer",
+                            data,
+                            getWidth: data => 4,
+                            getColor: data => data.color,
+                            widthMinPixels: 4,
+                            rounded: true
+                        }),
+                        new PathLayer({
+                            id: "end-layer",
+                            data: end,
+                            getWidth: data => 4,
+                            getColor: data => data.color,
+                            widthMinPixels: 4,
+                            rounded: true
+                        }),
+                    ];
 
-                this.setState({
-                    layer: layer,
-                    direction: response.routes[0].legs,
-                    loading: false
-                });
+                    this.setState({
+                        layer: layer,
+                        direction: response.routes[0].legs,
+                        loading: false
+                    });
+                } else {
+                    this.setState({
+                        loading: false
+                    })
+                }
             });
 
     };
@@ -438,7 +441,6 @@ class Map extends Component {
         const { viewport, layer } = this.state;
 
         return(
-            <div>
             <SiteWrapper>
                 <div style={{
                     position: "relative",
@@ -453,7 +455,6 @@ class Map extends Component {
                         defaultOpen={true}
                     >
                         {this.loadPanel()}
-                        {console.log(this.state)}
                         {/*<div className="card">*/}
                         {/*    <div className="card-body">*/}
                         {/*        <CardLink onClick={this.searchRestaurant} href="#">*/}
@@ -503,7 +504,6 @@ class Map extends Component {
                     </MapGL>
                 </div>
             </SiteWrapper>
-            </div>
         )
     }
 
