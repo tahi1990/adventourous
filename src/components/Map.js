@@ -1,5 +1,5 @@
 import React,{ Component } from 'react'
-import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl } from 'react-map-gl'
+import MapGL, { Marker, Popup, NavigationControl, FullscreenControl, GeolocateControl } from 'react-map-gl'
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
@@ -8,6 +8,7 @@ import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
 import Weather from './Weather';
+import MarkerInfo from './MarkerInfo';
 import loader from '../assets/loader.svg';
 
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
@@ -21,8 +22,8 @@ import PlaceDetails from './PlaceDetails';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
-const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14'
-const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
+const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14';
+const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 const style = {
     position: 'absolute',
@@ -104,12 +105,6 @@ class Map extends Component {
         });
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.id !== prevProps.id) {
-          this.setDefaultTranslation(this.props.viewport)
-        }
-      }
-
     handleSearch = (place_id) => {
         const curThis = this;
         curThis.setState({
@@ -146,6 +141,13 @@ class Map extends Component {
                 <Dimmer inverted active={loading}>
                     <Loader inverted size='medium'>Loading</Loader>
                 </Dimmer>
+
+                { !search && (
+                    <div>
+                        <Button onClick={this.backToSearch} basic color='blue' content='Back to search' icon='left arrow' labelPosition='left' />
+                        <Divider />
+                    </div>
+                )}
 
                 { this.state.weatherData && (
                     <Container>
@@ -207,6 +209,16 @@ class Map extends Component {
         );
     };
 
+    backToSearch = () => {
+        this.setState({
+            search: true,
+            layer: null,
+            markers: [],
+            details: false,
+            loading: false
+        });
+    };
+
     loadMarkers = () => {
         return this.state.markers.map(marker => {
             return (
@@ -215,7 +227,14 @@ class Map extends Component {
                     latitude={parseFloat(marker.geometry.location.lat)}
                     longitude={parseFloat(marker.geometry.location.lng)}
                 >
-                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
+                    <img onClick={() => this.setState({
+                        popupInfo: {
+                            name: marker.name,
+                            longitude: marker.geometry.location.lng,
+                            latitude: marker.geometry.location.lat,
+                            image: marker.photos && marker.photos.length > 0 ? marker.photos[0].photo_reference : null
+                        }
+                    })} style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
                 </Marker>
             );
         });
@@ -298,8 +317,6 @@ class Map extends Component {
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-                console.log('load weather data')
-                console.log(data)
                 if(data.cod === 200)
                 {
                     this.setState({
@@ -358,7 +375,7 @@ class Map extends Component {
 
         fetch(url).then(res => res.json())
             .then((response) => {
-                if(response.routes > 0) {
+                if(response.routes.length > 0) {
                     const path = response.routes[0].geometry.coordinates;
 
                     const start = [{
@@ -437,6 +454,26 @@ class Map extends Component {
         })
     };
 
+    renderPopup = () => {
+        const {popupInfo} = this.state;
+
+        return (
+            popupInfo && (
+                <Popup
+                    tipSize={5}
+                    anchor="top"
+                    longitude={popupInfo.longitude}
+                    latitude={popupInfo.latitude}
+                    closeOnClick={false}
+                    onClose={() => this.setState({popupInfo: null})}
+                >
+                    <MarkerInfo
+                        info={popupInfo} />
+                </Popup>
+            )
+        );
+    };
+
     render() {
         const { viewport, layer } = this.state;
 
@@ -454,14 +491,9 @@ class Map extends Component {
                         showMask={false}
                         defaultOpen={true}
                     >
+
                         {this.loadPanel()}
-                        {/*<div className="card">*/}
-                        {/*    <div className="card-body">*/}
-                        {/*        <CardLink onClick={this.searchRestaurant} href="#">*/}
-                        {/*            <FontAwesomeIcon icon={faCoffee} />*/}
-                        {/*        </CardLink>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+
                     </Drawer>
 
                     <MapGL
@@ -477,6 +509,8 @@ class Map extends Component {
                         />
 
                         {this.loadMarkers()}
+
+                        {this.renderPopup()}
 
                         { this.state.currentLocation && (
                             <Marker
@@ -509,13 +543,13 @@ class Map extends Component {
 
 }
 
-const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-        resolve(reader.result);
-    };
-    reader.readAsDataURL(blob);
-});
+// const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.onerror = reject;
+//     reader.onload = () => {
+//         resolve(reader.result);
+//     };
+//     reader.readAsDataURL(blob);
+// });
 
 export default Map;

@@ -46,9 +46,9 @@ class PlaceDetails extends PureComponent {
         const {active, type} = this.state;
 
         return(
-            <Container>
+            <div>
                 <Button.Group basic icon fluid>
-                    <Button active basic color='red' onClick={() => {
+                    <Button disabled={type === 'Driving'} basic color='red' onClick={() => {
                         this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'driving');
                         this.setState({
                             type: 'Driving'
@@ -56,7 +56,7 @@ class PlaceDetails extends PureComponent {
                     }}>
                         <Icon name='car' color='red'/>
                     </Button>
-                    <Button basic color='green' onClick={() => {
+                    <Button disabled={type === 'Cycling'} basic color='green' onClick={() => {
                         this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'cycling');
                         this.setState({
                             type: 'Cycling'
@@ -64,7 +64,7 @@ class PlaceDetails extends PureComponent {
                     }}>
                         <Icon name='bicycle' color='green' />
                     </Button>
-                    <Button basic color='blue' onClick={() => {
+                    <Button disabled={type === 'Walking'} basic color='blue' onClick={() => {
                         this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'walking');
                         this.setState({
                             type: 'Walking'
@@ -119,7 +119,7 @@ class PlaceDetails extends PureComponent {
                 </List>
                 {/*<p>{data.formatted_address}</p>*/}
 
-            </Container>
+            </div>
         );
     }
 
