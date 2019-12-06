@@ -110,12 +110,10 @@ class Map extends Component {
       }
 
     handleSearch = (place_id) => {
-        this.setState({
-            loading: true
-        });
-
+        const curThis = this
         this.requestPlace(place_id).then((data)=>{
-                this.setState({
+                console.log(data)
+                curThis.setState({
                     viewport: {
                         latitude: data.result.geometry.location.lat,
                         longitude: data.result.geometry.location.lng,
@@ -126,12 +124,9 @@ class Map extends Component {
                         pitch: 0
                     }
                 })
+                curThis.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude)
             });
-        this.setState({
-            loading: false
-        });
-
-        this.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude);
+        
         
     }
 
