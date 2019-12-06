@@ -1,17 +1,41 @@
 import React, { PureComponent, Component } from 'react'
-import { Card, Grid, Header } from 'semantic-ui-react'
+import { Card, Grid, Header, List, Image } from 'semantic-ui-react'
 import { string } from 'prop-types';
 
 const OPEN_WEATHER_URL = 'http://openweathermap.org/img/wn/'
 
 class WeatherDashboard extends PureComponent{
+    state={}
     getWeatherIcon(icon){
         return OPEN_WEATHER_URL + icon + '@2x.png'
     }
 
     DateTimeStr = (datetime) => {
-        var str = datetime.substring(8,10) + '.' + datetime.substring(5,7) + '.' + datetime.substring(0,4)
+        var str = datetime.substring(8,10) + '.' + datetime.substring(5,7) //+ '.' + datetime.substring(0,4)
         return str
+    }
+
+    getWeatherIcon(icon){
+        return OPEN_WEATHER_URL + icon + '@2x.png'
+    }
+
+    createForecastDate = (data) => {
+        return (
+            <Grid.Column width={4}>
+                {this.DateTimeStr(data.dt_txt)}
+            </Grid.Column>
+        )
+    }
+
+    createForeCastData = (data) => {
+        console.log(data)
+        return (
+            <Grid.Column>
+                <Image src={this.getWeatherIcon(data.weather[0].icon)} size='small' />
+                {/* <img  height={30} width={30} src={this.getWeatherIcon(data.weather[0].icon)} /> */}
+                <span><font size="-1">{Math.round(data.main.temp)}&deg;C</font></span>
+            </Grid.Column>
+        )
     }
 
     render() {
@@ -23,14 +47,14 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575644400,
                 "main": {
-                  "temp": 285.25,
-                  "temp_min": 285.25,
-                  "temp_max": 285.66,
+                  "temp": 12.04,
+                  "temp_min": 12.04,
+                  "temp_max": 12.51,
                   "pressure": 1001,
                   "sea_level": 1001,
                   "grnd_level": 997,
                   "humidity": 70,
-                  "temp_kf": -0.41
+                  "temp_kf": -0.47
                 },
                 "weather": [
                   {
@@ -58,14 +82,14 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575655200,
                 "main": {
-                  "temp": 283.43,
-                  "temp_min": 283.43,
-                  "temp_max": 283.74,
+                  "temp": 10.24,
+                  "temp_min": 10.24,
+                  "temp_max": 10.59,
                   "pressure": 1003,
                   "sea_level": 1003,
                   "grnd_level": 1000,
                   "humidity": 67,
-                  "temp_kf": -0.31
+                  "temp_kf": -0.35
                 },
                 "weather": [
                   {
@@ -93,14 +117,14 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575666000,
                 "main": {
-                  "temp": 282.37,
-                  "temp_min": 282.37,
-                  "temp_max": 282.57,
+                  "temp": 9.18,
+                  "temp_min": 9.18,
+                  "temp_max": 9.42,
                   "pressure": 1007,
                   "sea_level": 1007,
                   "grnd_level": 1003,
                   "humidity": 74,
-                  "temp_kf": -0.2
+                  "temp_kf": -0.24
                 },
                 "weather": [
                   {
@@ -125,14 +149,14 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575676800,
                 "main": {
-                  "temp": 281.43,
-                  "temp_min": 281.43,
-                  "temp_max": 281.53,
+                  "temp": 8.26,
+                  "temp_min": 8.26,
+                  "temp_max": 8.38,
                   "pressure": 1010,
                   "sea_level": 1010,
                   "grnd_level": 1006,
                   "humidity": 81,
-                  "temp_kf": -0.1
+                  "temp_kf": -0.12
                 },
                 "weather": [
                   {
@@ -157,9 +181,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575687600,
                 "main": {
-                  "temp": 280.76,
-                  "temp_min": 280.76,
-                  "temp_max": 280.76,
+                  "temp": 7.61,
+                  "temp_min": 7.61,
+                  "temp_max": 7.61,
                   "pressure": 1011,
                   "sea_level": 1011,
                   "grnd_level": 1007,
@@ -189,9 +213,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575698400,
                 "main": {
-                  "temp": 280,
-                  "temp_min": 280,
-                  "temp_max": 280,
+                  "temp": 6.85,
+                  "temp_min": 6.85,
+                  "temp_max": 6.85,
                   "pressure": 1013,
                   "sea_level": 1013,
                   "grnd_level": 1009,
@@ -221,9 +245,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575709200,
                 "main": {
-                  "temp": 279.91,
-                  "temp_min": 279.91,
-                  "temp_max": 279.91,
+                  "temp": 6.76,
+                  "temp_min": 6.76,
+                  "temp_max": 6.76,
                   "pressure": 1014,
                   "sea_level": 1014,
                   "grnd_level": 1010,
@@ -253,9 +277,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575720000,
                 "main": {
-                  "temp": 282.3,
-                  "temp_min": 282.3,
-                  "temp_max": 282.3,
+                  "temp": 9.15,
+                  "temp_min": 9.15,
+                  "temp_max": 9.15,
                   "pressure": 1014,
                   "sea_level": 1014,
                   "grnd_level": 1010,
@@ -285,9 +309,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575730800,
                 "main": {
-                  "temp": 282.54,
-                  "temp_min": 282.54,
-                  "temp_max": 282.54,
+                  "temp": 9.39,
+                  "temp_min": 9.39,
+                  "temp_max": 9.39,
                   "pressure": 1013,
                   "sea_level": 1013,
                   "grnd_level": 1009,
@@ -317,9 +341,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575741600,
                 "main": {
-                  "temp": 281.32,
-                  "temp_min": 281.32,
-                  "temp_max": 281.32,
+                  "temp": 8.17,
+                  "temp_min": 8.17,
+                  "temp_max": 8.17,
                   "pressure": 1013,
                   "sea_level": 1013,
                   "grnd_level": 1009,
@@ -349,9 +373,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575752400,
                 "main": {
-                  "temp": 281.41,
-                  "temp_min": 281.41,
-                  "temp_max": 281.41,
+                  "temp": 8.26,
+                  "temp_min": 8.26,
+                  "temp_max": 8.26,
                   "pressure": 1011,
                   "sea_level": 1011,
                   "grnd_level": 1007,
@@ -381,9 +405,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575763200,
                 "main": {
-                  "temp": 282.89,
-                  "temp_min": 282.89,
-                  "temp_max": 282.89,
+                  "temp": 9.74,
+                  "temp_min": 9.74,
+                  "temp_max": 9.74,
                   "pressure": 1007,
                   "sea_level": 1007,
                   "grnd_level": 1003,
@@ -413,9 +437,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575774000,
                 "main": {
-                  "temp": 283.89,
-                  "temp_min": 283.89,
-                  "temp_max": 283.89,
+                  "temp": 10.74,
+                  "temp_min": 10.74,
+                  "temp_max": 10.74,
                   "pressure": 1002,
                   "sea_level": 1002,
                   "grnd_level": 997,
@@ -448,9 +472,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575784800,
                 "main": {
-                  "temp": 285.86,
-                  "temp_min": 285.86,
-                  "temp_max": 285.86,
+                  "temp": 12.71,
+                  "temp_min": 12.71,
+                  "temp_max": 12.71,
                   "pressure": 1000,
                   "sea_level": 1000,
                   "grnd_level": 995,
@@ -483,9 +507,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575795600,
                 "main": {
-                  "temp": 283.1,
-                  "temp_min": 283.1,
-                  "temp_max": 283.1,
+                  "temp": 9.95,
+                  "temp_min": 9.95,
+                  "temp_max": 9.95,
                   "pressure": 1001,
                   "sea_level": 1001,
                   "grnd_level": 997,
@@ -515,9 +539,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575806400,
                 "main": {
-                  "temp": 282.92,
-                  "temp_min": 282.92,
-                  "temp_max": 282.92,
+                  "temp": 9.77,
+                  "temp_min": 9.77,
+                  "temp_max": 9.77,
                   "pressure": 1002,
                   "sea_level": 1002,
                   "grnd_level": 997,
@@ -550,9 +574,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575817200,
                 "main": {
-                  "temp": 282.11,
-                  "temp_min": 282.11,
-                  "temp_max": 282.11,
+                  "temp": 8.96,
+                  "temp_min": 8.96,
+                  "temp_max": 8.96,
                   "pressure": 1000,
                   "sea_level": 1000,
                   "grnd_level": 996,
@@ -585,9 +609,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575828000,
                 "main": {
-                  "temp": 280.95,
-                  "temp_min": 280.95,
-                  "temp_max": 280.95,
+                  "temp": 7.8,
+                  "temp_min": 7.8,
+                  "temp_max": 7.8,
                   "pressure": 999,
                   "sea_level": 999,
                   "grnd_level": 995,
@@ -620,9 +644,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575838800,
                 "main": {
-                  "temp": 280.45,
-                  "temp_min": 280.45,
-                  "temp_max": 280.45,
+                  "temp": 7.3,
+                  "temp_min": 7.3,
+                  "temp_max": 7.3,
                   "pressure": 996,
                   "sea_level": 996,
                   "grnd_level": 992,
@@ -652,9 +676,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575849600,
                 "main": {
-                  "temp": 281.32,
-                  "temp_min": 281.32,
-                  "temp_max": 281.32,
+                  "temp": 8.17,
+                  "temp_min": 8.17,
+                  "temp_max": 8.17,
                   "pressure": 992,
                   "sea_level": 992,
                   "grnd_level": 988,
@@ -687,9 +711,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575860400,
                 "main": {
-                  "temp": 280.58,
-                  "temp_min": 280.58,
-                  "temp_max": 280.58,
+                  "temp": 7.43,
+                  "temp_min": 7.43,
+                  "temp_max": 7.43,
                   "pressure": 990,
                   "sea_level": 990,
                   "grnd_level": 986,
@@ -722,9 +746,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575871200,
                 "main": {
-                  "temp": 280.62,
-                  "temp_min": 280.62,
-                  "temp_max": 280.62,
+                  "temp": 7.47,
+                  "temp_min": 7.47,
+                  "temp_max": 7.47,
                   "pressure": 991,
                   "sea_level": 991,
                   "grnd_level": 988,
@@ -757,9 +781,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575882000,
                 "main": {
-                  "temp": 280.44,
-                  "temp_min": 280.44,
-                  "temp_max": 280.44,
+                  "temp": 7.29,
+                  "temp_min": 7.29,
+                  "temp_max": 7.29,
                   "pressure": 997,
                   "sea_level": 997,
                   "grnd_level": 993,
@@ -789,9 +813,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575892800,
                 "main": {
-                  "temp": 282.02,
-                  "temp_min": 282.02,
-                  "temp_max": 282.02,
+                  "temp": 8.87,
+                  "temp_min": 8.87,
+                  "temp_max": 8.87,
                   "pressure": 1004,
                   "sea_level": 1004,
                   "grnd_level": 1000,
@@ -821,9 +845,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575903600,
                 "main": {
-                  "temp": 281.31,
-                  "temp_min": 281.31,
-                  "temp_max": 281.31,
+                  "temp": 8.16,
+                  "temp_min": 8.16,
+                  "temp_max": 8.16,
                   "pressure": 1009,
                   "sea_level": 1009,
                   "grnd_level": 1005,
@@ -853,9 +877,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575914400,
                 "main": {
-                  "temp": 279.56,
-                  "temp_min": 279.56,
-                  "temp_max": 279.56,
+                  "temp": 6.41,
+                  "temp_min": 6.41,
+                  "temp_max": 6.41,
                   "pressure": 1015,
                   "sea_level": 1015,
                   "grnd_level": 1012,
@@ -885,9 +909,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575925200,
                 "main": {
-                  "temp": 278.65,
-                  "temp_min": 278.65,
-                  "temp_max": 278.65,
+                  "temp": 5.5,
+                  "temp_min": 5.5,
+                  "temp_max": 5.5,
                   "pressure": 1020,
                   "sea_level": 1020,
                   "grnd_level": 1016,
@@ -917,9 +941,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575936000,
                 "main": {
-                  "temp": 277.5,
-                  "temp_min": 277.5,
-                  "temp_max": 277.5,
+                  "temp": 4.35,
+                  "temp_min": 4.35,
+                  "temp_max": 4.35,
                   "pressure": 1022,
                   "sea_level": 1022,
                   "grnd_level": 1018,
@@ -949,9 +973,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575946800,
                 "main": {
-                  "temp": 276.73,
-                  "temp_min": 276.73,
-                  "temp_max": 276.73,
+                  "temp": 3.58,
+                  "temp_min": 3.58,
+                  "temp_max": 3.58,
                   "pressure": 1022,
                   "sea_level": 1022,
                   "grnd_level": 1018,
@@ -981,9 +1005,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575957600,
                 "main": {
-                  "temp": 276.67,
-                  "temp_min": 276.67,
-                  "temp_max": 276.67,
+                  "temp": 3.52,
+                  "temp_min": 3.52,
+                  "temp_max": 3.52,
                   "pressure": 1021,
                   "sea_level": 1021,
                   "grnd_level": 1016,
@@ -1013,9 +1037,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575968400,
                 "main": {
-                  "temp": 278.78,
-                  "temp_min": 278.78,
-                  "temp_max": 278.78,
+                  "temp": 5.63,
+                  "temp_min": 5.63,
+                  "temp_max": 5.63,
                   "pressure": 1018,
                   "sea_level": 1018,
                   "grnd_level": 1014,
@@ -1045,9 +1069,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575979200,
                 "main": {
-                  "temp": 281,
-                  "temp_min": 281,
-                  "temp_max": 281,
+                  "temp": 7.85,
+                  "temp_min": 7.85,
+                  "temp_max": 7.85,
                   "pressure": 1013,
                   "sea_level": 1013,
                   "grnd_level": 1009,
@@ -1080,9 +1104,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1575990000,
                 "main": {
-                  "temp": 281.82,
-                  "temp_min": 281.82,
-                  "temp_max": 281.82,
+                  "temp": 8.67,
+                  "temp_min": 8.67,
+                  "temp_max": 8.67,
                   "pressure": 1007,
                   "sea_level": 1007,
                   "grnd_level": 1003,
@@ -1115,9 +1139,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576000800,
                 "main": {
-                  "temp": 283.99,
-                  "temp_min": 283.99,
-                  "temp_max": 283.99,
+                  "temp": 10.84,
+                  "temp_min": 10.84,
+                  "temp_max": 10.84,
                   "pressure": 1001,
                   "sea_level": 1001,
                   "grnd_level": 998,
@@ -1150,9 +1174,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576011600,
                 "main": {
-                  "temp": 281.38,
-                  "temp_min": 281.38,
-                  "temp_max": 281.38,
+                  "temp": 8.23,
+                  "temp_min": 8.23,
+                  "temp_max": 8.23,
                   "pressure": 1001,
                   "sea_level": 1001,
                   "grnd_level": 998,
@@ -1185,9 +1209,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576022400,
                 "main": {
-                  "temp": 280.54,
-                  "temp_min": 280.54,
-                  "temp_max": 280.54,
+                  "temp": 7.39,
+                  "temp_min": 7.39,
+                  "temp_max": 7.39,
                   "pressure": 1004,
                   "sea_level": 1004,
                   "grnd_level": 1000,
@@ -1220,9 +1244,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576033200,
                 "main": {
-                  "temp": 279.34,
-                  "temp_min": 279.34,
-                  "temp_max": 279.34,
+                  "temp": 6.19,
+                  "temp_min": 6.19,
+                  "temp_max": 6.19,
                   "pressure": 1006,
                   "sea_level": 1006,
                   "grnd_level": 1002,
@@ -1252,9 +1276,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576044000,
                 "main": {
-                  "temp": 278.75,
-                  "temp_min": 278.75,
-                  "temp_max": 278.75,
+                  "temp": 5.6,
+                  "temp_min": 5.6,
+                  "temp_max": 5.6,
                   "pressure": 1005,
                   "sea_level": 1005,
                   "grnd_level": 1001,
@@ -1284,9 +1308,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576054800,
                 "main": {
-                  "temp": 278.58,
-                  "temp_min": 278.58,
-                  "temp_max": 278.58,
+                  "temp": 5.43,
+                  "temp_min": 5.43,
+                  "temp_max": 5.43,
                   "pressure": 1005,
                   "sea_level": 1005,
                   "grnd_level": 1001,
@@ -1316,9 +1340,9 @@ class WeatherDashboard extends PureComponent{
               {
                 "dt": 1576065600,
                 "main": {
-                  "temp": 280.49,
-                  "temp_min": 280.49,
-                  "temp_max": 280.49,
+                  "temp": 7.34,
+                  "temp_min": 7.34,
+                  "temp_max": 7.34,
                   "pressure": 1003,
                   "sea_level": 1003,
                   "grnd_level": 999,
@@ -1360,26 +1384,44 @@ class WeatherDashboard extends PureComponent{
               "sunset": 1575647579
             }
           };
-        
-        
 
+        var foreCastData = weatherForecastData.list.slice(1,4)
         return (
             <Card>
                 <Card.Content>
                     <Grid divided='vertically'>
-                        <Grid.Row columns={2}>
+                        <Grid.Row columns={2} verticalAlign='middle'>
                             <Grid.Column textAlign='left' verticalAlign='middle'>
                                 <Header as='h3'>{weatherForecastData.city.name}</Header>
                             </Grid.Column>
                             <Grid.Column textAlign='right' verticalAlign='middle'>
-                                { this.DateTimeStr(weatherForecastData.list[0].dt_txt)}
+                                {this.DateTimeStr(weatherForecastData.list[0].dt_txt)}
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row columns={2}>
+                            <Grid.Column textAlign='left' width={5}>
+                                <img  height={60} width={60} src={this.getWeatherIcon(weatherForecastData.list[0].weather[0].icon)} />
+                            </Grid.Column>
+                            <Grid.Column textAlign='left' width={9}>
+                                <List>
+                                    <List.Item>Temp: {Math.round(weatherForecastData.list[0].main.temp)}&deg;C</List.Item>
+                                    <List.Item>Humidity: {weatherForecastData.list[0].main.humidity}&#37;</List.Item>
+                                    <List.Item>Wind: {weatherForecastData.list[0].wind.speed} m/s</List.Item>
+                                </List>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
                 </Card.Content>
-                <Card.Content>
-
-                </Card.Content>
+                {/* <Card.Content>
+                    <Grid>
+                    <Grid.Row columns={3}>
+                        {foreCastData.map(this.createForecastDate)}
+                    </Grid.Row>
+                    <Grid.Row columns={3}>
+                        {foreCastData.map(this.createForeCastData)}
+                    </Grid.Row>
+                    </Grid>
+                </Card.Content> */}
             </Card>
         );
     }
