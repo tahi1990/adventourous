@@ -15,7 +15,9 @@ import {
 import { ProgressBar } from 'react-fetch-progressbar';
 
 import type { NotificationProps } from "tabler-react";
-import LoginModal from './components/LoginModal';
+import { Modal } from 'semantic-ui-react';
+import GoogleLogin from 'react-google-login';
+import { userService } from './services';
 
 type Props = {|
     +children: React.Node,
@@ -60,21 +62,6 @@ const navBarItems: Array<navItem> = [
     },
 ];
 
-const accountDropdownProps = {
-    avatarURL: "./demo/faces/female/25.jpg",
-    name: "Jane Pearson",
-    description: "Administrator",
-    options: [
-        { icon: "user", value: "Profile" },
-        { icon: "settings", value: "Settings" },
-        { icon: "mail", value: "Inbox", badge: "6" },
-        { icon: "send", value: "Message" },
-        { isDivider: true },
-        { icon: "help-circle", value: "Need help?" },
-        { icon: "log-out", value: "Sign out" },
-    ],
-};
-
 const style = {
     backgroundColor: 'red',
     height: '3px'
@@ -82,47 +69,74 @@ const style = {
 
 class SiteWrapper extends React.Component<Props, State> {
     state = {
-        notificationsObjects: [
-            {
-                unread: true,
-                avatarURL: "demo/faces/male/41.jpg",
-                message: (
-                    <React.Fragment>
-                        <strong>Nathan</strong> pushed new commit: Fix page load performance
-                        issue.
-                    </React.Fragment>
-                ),
-                time: "10 minutes ago",
-            },
-            {
-                unread: true,
-                avatarURL: "demo/faces/female/1.jpg",
-                message: (
-                    <React.Fragment>
-                        <strong>Alice</strong> started new task: Tabler UI design.
-                    </React.Fragment>
-                ),
-                time: "1 hour ago",
-            },
-            {
-                unread: false,
-                avatarURL: "demo/faces/female/18.jpg",
-                message: (
-                    <React.Fragment>
-                        <strong>Rose</strong> deployed new version of NodeJS REST Api // V3
-                    </React.Fragment>
-                ),
-                time: "2 hours ago",
-            },
-        ],
+        open: false,
+        accountDropdownProps: null
+    };
+
+    toggle = () => {
+        this.setState({
+            open: !this.state.open,
+        });
+    };
+
+    responseGoogle = (response) => {
+        console.log(response);
+
+        const user = {
+            name: response.profileObj.name,
+            email: response.profileObj.email,
+            id: response.profileObj.googleId,
+            image: response.profileObj.imageUrl
+        };
+
+        userService.getUser(user.id).then(data => {
+           if (data.user) {
+               localStorage.setItem('user', JSON.stringify(data.user));
+               this.setData(data.user)
+           } else {
+               userService.addUser(user)
+               .then(data => {
+                   localStorage.setItem('user', JSON.stringify(data.user));
+                   this.setData(data.user);
+               });
+           }
+        });
+
+        this.setState({
+            open: false
+        });
+    };
+
+    logout = () => {
+        localStorage.removeItem('user');
+        this.setState({
+            accountDropdownProps: null
+        })
+    };
+
+    setData = (user) => {
+        this.setState({
+            accountDropdownProps: {
+                avatarURL: user.image,
+                name: user.name,
+                description: user.email,
+                options: [
+                    { icon: "log-out", value: "Sign out", onClick: this.logout }
+                ],
+            }
+        });
     };
 
     render(): React.Node {
-        const notificationsObjects = this.state.notificationsObjects || [];
-        const unreadCount = this.state.notificationsObjects.reduce(
-            (a, v) => a || v.unread,
-            false
-        );
+
+        const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+        if (user && !this.state.accountDropdownProps) {
+            this.setData(user);
+        }
+
+        const {open, accountDropdownProps} = this.state;
+
         return (
             <div>
                 <ProgressBar style={style}/>
@@ -133,34 +147,30 @@ class SiteWrapper extends React.Component<Props, State> {
                         imageURL: "./images/logo.png",
                         navItems: (
                             <Nav.Item type="div" className="d-none d-md-flex">
-                                <LoginModal>
-
-                                </LoginModal>
+                                { !localStorage.getItem('user') && (
+                                    <Modal
+                                        open={open}
+                                        closeOnDimmerClick={true}
+                                        onClose={this.toggle}
+                                        size='tiny' trigger={
+                                        <Button color="danger" onClick={this.toggle}>
+                                            Login
+                                        </Button>
+                                    } centered={false}>
+                                        <Modal.Header>Login</Modal.Header>
+                                        <Modal.Content>
+                                            <GoogleLogin
+                                                clientId="484363137484-u1toqlta0ca22ffea62kllqnios1j6ds.apps.googleusercontent.com"
+                                                buttonText="LOGIN WITH GOOGLE"
+                                                onSuccess={this.responseGoogle}
+                                                onFailure={this.responseGoogle}
+                                            />
+                                        </Modal.Content>
+                                    </Modal>
+                                )}
                             </Nav.Item>
                         ),
-                        // notificationsTray: {
-                        //     notificationsObjects,
-                        //     markAllAsRead: () =>
-                        //         this.setState(
-                        //             () => ({
-                        //                 notificationsObjects: this.state.notificationsObjects.map(
-                        //                     v => ({ ...v, unread: false })
-                        //                 ),
-                        //             }),
-                        //             () =>
-                        //                 setTimeout(
-                        //                     () =>
-                        //                         this.setState({
-                        //                             notificationsObjects: this.state.notificationsObjects.map(
-                        //                                 v => ({ ...v, unread: true })
-                        //                             ),
-                        //                         }),
-                        //                     5000
-                        //                 )
-                        //         ),
-                        //     unread: unreadCount,
-                        // },
-                        // accountDropdown: accountDropdownProps,
+                        accountDropdown: accountDropdownProps,
                     }}
                     navProps={{ itemsObjects: navBarItems }}
                     routerContextComponentType={withRouter(RouterContextProvider)}

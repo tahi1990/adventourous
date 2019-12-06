@@ -46,6 +46,10 @@
   padding: 0;
 }
 
+.ui.modal {
+  bottom: auto;
+}
+
 .mapboxgl-popup {
   z-index: 9999;
 }
