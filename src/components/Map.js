@@ -3,7 +3,7 @@ import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl }
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
-import { Container, Header, Grid, Button, Icon, Dimmer, Loader } from 'semantic-ui-react'
+import { Container, Grid, Button, Icon, Dimmer, Loader } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
