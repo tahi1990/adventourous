@@ -1,13 +1,15 @@
 import React,{ Component } from 'react'
-import MapGL, { Marker, NavigationControl, FullscreenControl, GeolocateControl } from 'react-map-gl'
+import MapGL, { Marker, Popup, NavigationControl, FullscreenControl, GeolocateControl } from 'react-map-gl'
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
-import { Container, Grid, Button, Icon, Dimmer, Loader } from 'semantic-ui-react'
+import { Container, Header, Grid, Button, Icon, Dimmer, Loader, Divider } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
 import _ from 'lodash';
 import Weather from './Weather';
+import MarkerInfo from './MarkerInfo';
+import loader from '../assets/loader.svg';
 
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
@@ -20,8 +22,8 @@ import PlaceDetails from './PlaceDetails';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
-const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14'
-const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
+const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14';
+const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 const style = {
     position: 'absolute',
@@ -103,32 +105,30 @@ class Map extends Component {
         });
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.id !== prevProps.id) {
-          this.setDefaultTranslation(this.props.viewport)
-        }
-      }
-
     handleSearch = (place_id) => {
-        const curThis = this
+        const curThis = this;
+        curThis.setState({
+            loading: true
+        });
+
         this.requestPlace(place_id).then((data)=>{
-                console.log(data)
-                curThis.setState({
-                    viewport: {
-                        latitude: data.result.geometry.location.lat,
-                        longitude: data.result.geometry.location.lng,
-                        width: "100%",
-                        height: 600,
-                        zoom: 13,
-                        bearing: 0,
-                        pitch: 0
-                    }
-                })
-                curThis.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude)
+            curThis.setState({
+                viewport: {
+                    latitude: data.result.geometry.location.lat,
+                    longitude: data.result.geometry.location.lng,
+                    width: "100%",
+                    height: 600,
+                    zoom: 13,
+                    bearing: 0,
+                    pitch: 0
+                },
+                loading: false
             });
+            curThis.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude)
+        });
         
         
-    }
+    };
 
     loadPanel = () => {
         const search = this.state.search;
@@ -138,41 +138,60 @@ class Map extends Component {
 
         return (
             <Container style={{ padding: '1em' }}>
-                {/*<Header as='h3'>Search this area</Header>*/}
-
                 <Dimmer inverted active={loading}>
                     <Loader inverted size='medium'>Loading</Loader>
                 </Dimmer>
 
-                {
-                    this.state.weatherData &&
-                    (<Weather data={this.state.weatherData} />
+                { !search && (
+                    <div>
+                        <Button onClick={this.backToSearch} basic color='blue' content='Back to search' icon='left arrow' labelPosition='left' />
+                        <Divider />
+                    </div>
                 )}
-                {console.log(this.state.weatherData)}
-                <GooglePlacesAutocomplete
-                    onSelect={({ place_id }) => (
-                        this.handleSearch(place_id)
-                      )}
-                />
-                {
-                    search && (
-                    <Grid>
-                        <Grid.Column>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
-                                <Icon circular inverted color='teal' name='food'/>
-                            </Button>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                                <Icon circular inverted color='teal' name='coffee'/>
-                            </Button>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
-                                <Icon circular inverted color='teal' name='hotel'/>
-                            </Button>
-                            <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                                <Icon circular inverted color='teal' name='shopping cart'/>
-                            </Button>
-                        </Grid.Column>
-                    </Grid>)
-                }
+
+                { this.state.weatherData && (
+                    <Container>
+                        <Weather data={this.state.weatherData} />
+                    </Container>
+                )}
+
+                { search && (
+                    <div>
+                        <Divider horizontal>
+                            <Header as='h4'>
+                                <Icon name='search' />
+                                Search
+                            </Header>
+                        </Divider>
+
+                        <GooglePlacesAutocomplete
+                            placeholder={'Search'}
+                            loader={<img alt="" src={loader} />}
+                            onSelect={({ place_id }) => (
+                                this.handleSearch(place_id)
+                            )}
+                        />
+
+                        <Divider hidden/>
+
+                        <Grid>
+                            <Grid.Column>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                                    <Icon circular inverted color='teal' name='food'/>
+                                </Button>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                                    <Icon circular inverted color='teal' name='coffee'/>
+                                </Button>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
+                                    <Icon circular inverted color='teal' name='hotel'/>
+                                </Button>
+                                <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                    <Icon circular inverted color='teal' name='shopping cart'/>
+                                </Button>
+                            </Grid.Column>
+                        </Grid>
+                    </div>
+                    )}
 
                 {
                     details && (
@@ -190,6 +209,16 @@ class Map extends Component {
         );
     };
 
+    backToSearch = () => {
+        this.setState({
+            search: true,
+            layer: null,
+            markers: [],
+            details: false,
+            loading: false
+        });
+    };
+
     loadMarkers = () => {
         return this.state.markers.map(marker => {
             return (
@@ -198,7 +227,14 @@ class Map extends Component {
                     latitude={parseFloat(marker.geometry.location.lat)}
                     longitude={parseFloat(marker.geometry.location.lng)}
                 >
-                    <img style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
+                    <img onClick={() => this.setState({
+                        popupInfo: {
+                            name: marker.name,
+                            longitude: marker.geometry.location.lng,
+                            latitude: marker.geometry.location.lat,
+                            image: marker.photos && marker.photos.length > 0 ? marker.photos[0].photo_reference : null
+                        }
+                    })} style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
                 </Marker>
             );
         });
@@ -206,7 +242,7 @@ class Map extends Component {
 
     searchByKeyword = (keyword) => {
         const params = {
-            location: this.state.currentLocation.latitude + ',' + this.state.currentLocation.longitude,
+            location: this.state.viewport.latitude + ',' + this.state.viewport.longitude,
             radius: 2000,
             type: keyword,
             key: GOOGLE_API_KEY
@@ -281,8 +317,6 @@ class Map extends Component {
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-                console.log('load weather data')
-                console.log(data)
                 if(data.cod === 200)
                 {
                     this.setState({
@@ -322,25 +356,6 @@ class Map extends Component {
         });
     };
 
-    getPlacePhoto = (reference) => {
-        const params = {
-            photoreference: reference,
-            maxwidth: 400,
-            key: GOOGLE_API_KEY,
-        };
-
-        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo');
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-
-        fetch(url).then(res => res.blob())
-            .then(convertBlobToBase64)
-            .then(image => {
-                this.setState({
-                    image: image
-                });
-            });
-    };
-
     getDirections = (lng, lat, type) => {
 
         const params = {
@@ -360,65 +375,70 @@ class Map extends Component {
 
         fetch(url).then(res => res.json())
             .then((response) => {
-                console.log(response);
-                const path = response.routes[0].geometry.coordinates;
+                if(response.routes.length > 0) {
+                    const path = response.routes[0].geometry.coordinates;
 
-                const start = [{
-                    name: "start",
-                    color: [169, 169, 169],
-                    path: [
-                        [this.state.currentLocation.longitude, this.state.currentLocation.latitude],
-                        path[0]
-                    ]
-                }];
+                    const start = [{
+                        name: "start",
+                        color: [169, 169, 169],
+                        path: [
+                            [this.state.currentLocation.longitude, this.state.currentLocation.latitude],
+                            path[0]
+                        ]
+                    }];
 
-                const data = [{
-                    name: "random-name",
-                    color: [101, 147, 245],
-                    path: path
-                }];
+                    const data = [{
+                        name: "random-name",
+                        color: [101, 147, 245],
+                        path: path
+                    }];
 
-                const end = [{
-                    name: "end",
-                    color: [169, 169, 169],
-                    path: [
-                        path[path.length - 1],
-                        [lng, lat]
-                    ]
-                }];
+                    const end = [{
+                        name: "end",
+                        color: [169, 169, 169],
+                        path: [
+                            path[path.length - 1],
+                            [lng, lat]
+                        ]
+                    }];
 
-                const layer = [
-                    new PathLayer({
-                        id: "start-layer",
-                        data: start,
-                        getWidth: data => 4,
-                        getColor: data => data.color,
-                        widthMinPixels: 4,
-                        rounded: true
-                    }),
-                    new PathLayer({
-                        id: "path-layer",
-                        data,
-                        getWidth: data => 4,
-                        getColor: data => data.color,
-                        widthMinPixels: 4,
-                        rounded: true
-                    }),
-                    new PathLayer({
-                        id: "end-layer",
-                        data: end,
-                        getWidth: data => 4,
-                        getColor: data => data.color,
-                        widthMinPixels: 4,
-                        rounded: true
-                    }),
-                ];
+                    const layer = [
+                        new PathLayer({
+                            id: "start-layer",
+                            data: start,
+                            getWidth: data => 4,
+                            getColor: data => data.color,
+                            widthMinPixels: 4,
+                            rounded: true
+                        }),
+                        new PathLayer({
+                            id: "path-layer",
+                            data,
+                            getWidth: data => 4,
+                            getColor: data => data.color,
+                            widthMinPixels: 4,
+                            rounded: true
+                        }),
+                        new PathLayer({
+                            id: "end-layer",
+                            data: end,
+                            getWidth: data => 4,
+                            getColor: data => data.color,
+                            widthMinPixels: 4,
+                            rounded: true
+                        }),
+                    ];
 
-                this.setState({
-                    layer: layer,
-                    direction: response.routes[0].legs,
-                    loading: false
-                });
+                    this.setState({
+                        layer: layer,
+                        direction: response.routes[0].legs,
+                        loading: false
+                    });
+                } else {
+                    this.setState({
+                        loading: false
+                    })
+                }
             });
 
     };
@@ -434,11 +454,30 @@ class Map extends Component {
         })
     };
 
+    renderPopup = () => {
+        const {popupInfo} = this.state;
+
+        return (
+            popupInfo && (
+                <Popup
+                    tipSize={5}
+                    anchor="top"
+                    longitude={popupInfo.longitude}
+                    latitude={popupInfo.latitude}
+                    closeOnClick={false}
+                    onClose={() => this.setState({popupInfo: null})}
+                >
+                    <MarkerInfo
+                        info={popupInfo} />
+                </Popup>
+            )
+        );
+    };
+
     render() {
         const { viewport, layer } = this.state;
 
         return(
-            <div>
             <SiteWrapper>
                 <div style={{
                     position: "relative",
@@ -452,15 +491,9 @@ class Map extends Component {
                         showMask={false}
                         defaultOpen={true}
                     >
+
                         {this.loadPanel()}
-                        {console.log(this.state)}
-                        {/*<div className="card">*/}
-                        {/*    <div className="card-body">*/}
-                        {/*        <CardLink onClick={this.searchRestaurant} href="#">*/}
-                        {/*            <FontAwesomeIcon icon={faCoffee} />*/}
-                        {/*        </CardLink>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+
                     </Drawer>
 
                     <MapGL
@@ -476,6 +509,8 @@ class Map extends Component {
                         />
 
                         {this.loadMarkers()}
+
+                        {this.renderPopup()}
 
                         { this.state.currentLocation && (
                             <Marker
@@ -503,19 +538,18 @@ class Map extends Component {
                     </MapGL>
                 </div>
             </SiteWrapper>
-            </div>
         )
     }
 
 }
 
-const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-        resolve(reader.result);
-    };
-    reader.readAsDataURL(blob);
-});
+// const convertBlobToBase64 = blob => new Promise((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.onerror = reject;
+//     reader.onload = () => {
+//         resolve(reader.result);
+//     };
+//     reader.readAsDataURL(blob);
+// });
 
 export default Map;
