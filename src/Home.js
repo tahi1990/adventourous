@@ -82,7 +82,11 @@ class Home extends React.Component{
         return fetch(url).then(res => res.json());
     };
 
-
+    isLogin = () =>{
+        this.setState({
+            isLogin: true
+        })
+    }
 
     render() {
         return (
