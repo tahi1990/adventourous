@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react'
-import { Grid, Container, Card, Feed, Image, Divider } from 'semantic-ui-react'
+import { Grid, Container, Card, Feed, Header, Divider } from 'semantic-ui-react'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import WeatherDashboard from './components/WeatherDashboard'
 import DashboardActivities from './components/DashboardActivities'
@@ -115,12 +115,30 @@ class Home extends React.Component{
                                     <WeatherDashboard data={this.state.weatherData}/>
                                 )}
                             </Grid.Column>
-                            <Grid.Column width={8}>
-                                <Grid columns={4} divided>
-                                    {this.state.place_id &&(
-                                        <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
-                                    )}
-                                </Grid>
+                            <Grid.Column width={12}>
+                                {this.state.place_id &&(
+                                    <div>
+                                        <Grid.Row>
+                                            <label>Tourist attraction</label>
+                                            <Grid columns={4} divided>
+                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
+                                            </Grid>
+                                        </Grid.Row>
+                                        <Grid.Row>
+                                            <label>Restaurant</label>
+                                            <Grid columns={4} divided>
+                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'restaurant'}}/>
+                                            </Grid>
+                                        </Grid.Row>
+                                        <Grid.Row>
+                                            <label>Hotel</label>
+                                            <Grid columns={4} divided>
+                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'hotel'}}/>
+                                            </Grid>
+                                        </Grid.Row>
+                                    </div>
+                                )}
+                                
                             </Grid.Column>
                         </Grid>
                     </Container>
