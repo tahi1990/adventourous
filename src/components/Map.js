@@ -148,11 +148,11 @@ class Map extends Component {
                 { !search && (
                     <div>
                         <Button onClick={this.backToSearch} basic color='blue' content='Back to search' icon='left arrow' labelPosition='left' />
-                        { details && !place.wish && (
+                        { details && localStorage.getItem('user') && !place.wish && (
                             <Button floated='right' onClick={this.addToWishlist} basic color='red' icon='bookmark outline' />
                         )}
 
-                        { details && place.wish && (
+                        { details && localStorage.getItem('user') && place.wish && (
                             <Button floated='right' onClick={this.addToWishlist} basic color='red' icon='bookmark' />
                         )}
                         <Divider />
