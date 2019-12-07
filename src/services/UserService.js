@@ -1,7 +1,8 @@
 
 export const userService = {
     addUser,
-    getUser
+    getUser,
+    updateUser
     // login,
     // logout
 };
@@ -20,6 +21,14 @@ function getUser(id) {
     return fetch(`${URL}/api/user/${id}`, {
         method: 'get',
         headers: {'Content-Type':'application/json', 'Access-Control-Allow-Origin': '*'}
+    }).then(res => res.json());
+}
+
+function updateUser(user) {
+    return fetch(`${URL}/api/user/${user.id}`, {
+        method: 'put',
+        headers: {'Content-Type':'application/json', 'Access-Control-Allow-Origin': '*'},
+        body: JSON.stringify(user)
     }).then(res => res.json());
 }
 

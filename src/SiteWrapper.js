@@ -15,6 +15,9 @@ import { ProgressBar } from 'react-fetch-progressbar';
 import { Modal } from 'semantic-ui-react';
 import GoogleLogin from 'react-google-login';
 import { userService } from './services';
+import {ToastContainer} from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 type Props = {|
     +children: React.Node,
@@ -77,8 +80,6 @@ class SiteWrapper extends React.Component<Props, State> {
     };
 
     responseGoogle = (response) => {
-        console.log(response);
-
         const user = {
             name: response.profileObj.name,
             email: response.profileObj.email,
@@ -137,6 +138,10 @@ class SiteWrapper extends React.Component<Props, State> {
         return (
             <div>
                 <ProgressBar style={style}/>
+                <ToastContainer
+                    autoClose={2000}
+
+                />
                 <Site.Wrapper
                     headerProps={{
                         href: "/",

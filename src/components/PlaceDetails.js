@@ -46,6 +46,41 @@ class PlaceDetails extends PureComponent {
 
         return(
             <div>
+
+                <Divider horizontal>
+                    <Header as='h4'>
+                        <Icon name='tags' />
+                        Details
+                    </Header>
+                </Divider>
+
+                <Image src={image} fluid />
+                <Header as='h3'>{data.name}</Header>
+                {data.rating} - <Rating maxRating={5} defaultRating={parseInt(data.rating)} icon='star' size='mini' disabled/> ({data.user_ratings_total}) · {price_level}
+
+                <Divider />
+
+                <List>
+                    <List.Item>
+                        <List.Icon name='marker' />
+                        <List.Content>{data.formatted_address}</List.Content>
+                    </List.Item>
+                    <List.Item>
+                        <List.Icon name='phone' />
+                        <List.Content>
+                            <a href={'tel:' + data.international_phone_number}>{data.international_phone_number}</a>
+                        </List.Content>
+                    </List.Item>
+                    <List.Item>
+                        <List.Icon name='linkify' />
+                        <List.Content>
+                            <a target='_blank' rel="noopener noreferrer" href={data.website}>{data.website}</a>
+                        </List.Content>
+                    </List.Item>
+                </List>
+
+                <Divider/>
+
                 <Button.Group basic icon fluid>
                     <Button disabled={type === 'Driving'} basic color='red' onClick={() => {
                         this.props.getDirection(data.geometry.location.lng, data.geometry.location.lat, 'driving');
@@ -91,32 +126,6 @@ class PlaceDetails extends PureComponent {
                 )}
 
                 <Divider/>
-
-                <Image src={image} fluid />
-                <Header as='h3'>{data.name}</Header>
-                {data.rating} - <Rating maxRating={5} defaultRating={parseInt(data.rating)} icon='star' size='mini' disabled/> ({data.user_ratings_total}) · {price_level}
-
-                <Divider />
-
-                <List>
-                    <List.Item>
-                        <List.Icon name='marker' />
-                        <List.Content>{data.formatted_address}</List.Content>
-                    </List.Item>
-                    <List.Item>
-                        <List.Icon name='phone' />
-                        <List.Content>
-                            <a href={'tel:' + data.international_phone_number}>{data.international_phone_number}</a>
-                        </List.Content>
-                    </List.Item>
-                    <List.Item>
-                        <List.Icon name='linkify' />
-                        <List.Content>
-                            <a target='_blank' rel="noopener noreferrer" href={data.website}>{data.website}</a>
-                        </List.Content>
-                    </List.Item>
-                </List>
-                {/*<p>{data.formatted_address}</p>*/}
 
             </div>
         );

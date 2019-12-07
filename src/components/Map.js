@@ -6,10 +6,12 @@ import Drawer from 'rc-drawer';
 import { Container, Header, Grid, Button, Icon, Dimmer, Loader, Divider } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from './Places';
+import Pin from './Pin';
 import _ from 'lodash';
 import Weather from './Weather';
 import MarkerInfo from './MarkerInfo';
 import loader from '../assets/loader.svg';
+import { toast } from 'react-toastify';
 
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
@@ -19,6 +21,7 @@ import shopping from '../assets/images/shopping.png';
 import coffee from '../assets/images/coffee-n-tea.png';
 import place from '../assets/images/default.png';
 import PlaceDetails from './PlaceDetails';
+import {userService} from '../services';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
@@ -134,7 +137,7 @@ class Map extends Component {
         const search = this.state.search;
         const details = this.state.details;
 
-        const {loading} = this.state;
+        const { loading, place } = this.state;
 
         return (
             <Container style={{ padding: '1em' }}>
@@ -145,6 +148,13 @@ class Map extends Component {
                 { !search && (
                     <div>
                         <Button onClick={this.backToSearch} basic color='blue' content='Back to search' icon='left arrow' labelPosition='left' />
+                        { details && !place.wish && (
+                            <Button floated='right' onClick={this.addToWishlist} basic color='red' icon='bookmark outline' />
+                        )}
+
+                        { details && place.wish && (
+                            <Button floated='right' onClick={this.addToWishlist} basic color='red' icon='bookmark' />
+                        )}
                         <Divider />
                     </div>
                 )}
@@ -219,7 +229,51 @@ class Map extends Component {
         });
     };
 
+    addToWishlist = () => {
+        const place = this.state.place;
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const check = _.some(user.wishlist, function(e) {
+            return e.place === place.id;
+        });
+
+        if (check) {
+            _.remove(user.wishlist, function(e){
+                return e.place === place.id;
+            })
+        } else {
+            const obj = {
+                place: place.id,
+                name: place.name,
+                lat: place.geometry.lat,
+                lng: place.geometry.lng,
+                address: place.formatted_address,
+                image: place.photos && place.photos.length > 0 ? place.photos[0].photo_reference : ''
+            };
+
+            user.wishlist.push(obj);
+        }
+
+        userService.updateUser(user).then(data => {
+           localStorage.setItem('user', JSON.stringify(data.user));
+           if(check) {
+               this.setState({
+                   place: {...this.state.place, wish: false}
+               });
+               toast.info("Removed from your wishlist!!!");
+           } else {
+               this.setState({
+                   place: {...this.state.place, wish: true}
+               });
+               toast.info("Added to your wishlist!!!");
+           }
+        });
+
+    };
+
     loadMarkers = () => {
+        const {details} = this.state;
+
         return this.state.markers.map(marker => {
             return (
                 <Marker
@@ -227,14 +281,28 @@ class Map extends Component {
                     latitude={parseFloat(marker.geometry.location.lat)}
                     longitude={parseFloat(marker.geometry.location.lng)}
                 >
-                    <img onClick={() => this.setState({
-                        popupInfo: {
-                            name: marker.name,
-                            longitude: marker.geometry.location.lng,
-                            latitude: marker.geometry.location.lat,
-                            image: marker.photos && marker.photos.length > 0 ? marker.photos[0].photo_reference : null
-                        }
-                    })} style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
+                    { !details && (
+                        <img onClick={() => this.setState({
+                            popupInfo: {
+                                name: marker.name,
+                                longitude: marker.geometry.location.lng,
+                                latitude: marker.geometry.location.lat,
+                                image: marker.photos && marker.photos.length > 0 ? marker.photos[0].photo_reference : null
+                            }
+                        })} style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
+                    )};
+
+                    { details && (
+                        <Pin size={20} onClick={() => this.setState({
+                            popupInfo: {
+                                name: marker.name,
+                                longitude: marker.geometry.location.lng,
+                                latitude: marker.geometry.location.lat,
+                                image: marker.photos && marker.photos.length > 0 ? marker.photos[0].photo_reference : null
+                            }
+                        })} />
+                    )}
+
                 </Marker>
             );
         });
@@ -344,13 +412,25 @@ class Map extends Component {
             loading: true
         });
 
-        this.requestPlace(id).then((data)=>{
-           this.setState({
+        this.requestPlace(id).then((data)=> {
+            data.result.wish = false;
+            if(localStorage.getItem('user')) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const check = _.some(user.wishlist, function(e) {
+                    return e.place === data.result.id;
+                });
+
+                if(check) {
+                    data.result.wish = true;
+                }
+            }
+
+            this.setState({
                place: data.result,
                markers: [data.result],
                details: true,
-               loading: false
-           });
+               loading: false,
+            });
 
            // this.getPlacePhoto()
         });
