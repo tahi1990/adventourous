@@ -6,8 +6,10 @@ export const userService = {
     // logout
 };
 
+const URL = process.env.SERVER_URI || `http://localhost:5000`;
+
 function addUser(user) {
-    return fetch(`http://localhost:5000/api/user`, {
+    return fetch(`${URL}/api/user`, {
         method: 'post',
         headers: {'Content-Type':'application/json', 'Access-Control-Allow-Origin': '*'},
         body: JSON.stringify(user)
@@ -15,7 +17,7 @@ function addUser(user) {
 }
 
 function getUser(id) {
-    return fetch(`http://localhost:5000/api/user/${id}`, {
+    return fetch(`${URL}/api/user/${id}`, {
         method: 'get',
         headers: {'Content-Type':'application/json', 'Access-Control-Allow-Origin': '*'}
     }).then(res => res.json());
