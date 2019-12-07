@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react'
-import { Grid, Container, Card, Feed, Image } from 'semantic-ui-react'
+import { Grid, Container, Image } from 'semantic-ui-react'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import WeatherDashboard from './components/WeatherDashboard'
 

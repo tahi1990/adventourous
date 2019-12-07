@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
-import {Container, Header, Image, Item, Rating, Divider, List, Button, Icon, Accordion} from 'semantic-ui-react'
-import { Form } from 'tabler-react'
+import {Header, Image, Rating, Divider, List, Button, Icon, Accordion} from 'semantic-ui-react'
 
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 
@@ -113,7 +112,7 @@ class PlaceDetails extends PureComponent {
                     <List.Item>
                         <List.Icon name='linkify' />
                         <List.Content>
-                            <a target='_blank' href={data.website}>{data.website}</a>
+                            <a target='_blank' rel="noopener noreferrer" href={data.website}>{data.website}</a>
                         </List.Content>
                     </List.Item>
                 </List>
