@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react'
-import { Grid, Container, Card, Feed, Image } from 'semantic-ui-react'
+import { Grid, Container, Card, Feed, Image, Divider } from 'semantic-ui-react'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import WeatherDashboard from './components/WeatherDashboard'
 import DashboardActivities from './components/DashboardActivities'
@@ -17,9 +17,9 @@ const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 
 class Home extends React.Component{
-    state ={
+    state = {
         mounted:false
-    }
+    };
 
     componentDidMount () {
         this.setState({ mounted: true });
@@ -88,18 +88,23 @@ class Home extends React.Component{
         return (
             <SiteWrapper>
                 <Page.Content title="Dashboard">
-                    {process.env.REACT_APP_NAME}
-                    <GooglePlacesAutocomplete
-                        //onSelect = {console.log}
-                        onSelect = {({ place_id, structured_formatting }) => (
-                            this.handleSearch(place_id, structured_formatting.main_text)
-                        )}
-                        autocompletionRequest = {{
-                            types: ['(cities)']    
-                        }}
-                        placeholder='City'
-                    />
-                    <Container style={{ padding: '1em' }}>
+
+                    <Container>
+                        <GooglePlacesAutocomplete
+                            //onSelect = {console.log}
+                            onSelect = {({ place_id, structured_formatting }) => (
+                                this.handleSearch(place_id, structured_formatting.main_text)
+                            )}
+                            autocompletionRequest = {{
+                                types: ['(cities)']
+                            }}
+                            placeholder='City'
+                        />
+                    </Container>
+
+                    <Divider />
+
+                    <Container>
                         <Grid>  
                             <Grid.Column width={4}>
                                 {this.state.weatherData && (
@@ -107,13 +112,11 @@ class Home extends React.Component{
                                 )}
                             </Grid.Column>
                             <Grid.Column width={8}>
-                                <Grid>
-                                    <Grid.Row columns={4} divided>
-                                        {this.state.place_id &&(
-                                            <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
-                                        )}
-                                    </Grid.Row>
-                                </Grid>            
+                                <Grid columns={4} divided>
+                                    {this.state.place_id &&(
+                                        <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
+                                    )}
+                                </Grid>
                             </Grid.Column>
                         </Grid>
                     </Container>
