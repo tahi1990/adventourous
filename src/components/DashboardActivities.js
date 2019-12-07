@@ -12,7 +12,7 @@ class DashboardActivities extends PureComponent{
     }
 
     constructor(props){
-        super(props)
+        super(props);
         //console.log(props)
         // this.setState({
         //     keyword: props.data.keyword
@@ -23,7 +23,7 @@ class DashboardActivities extends PureComponent{
                 lat: data.result.geometry.location.lat,
                 lng: data.result.geometry.location.lng,
                 keyword: props.data.keyword
-            })
+            });
 
             this.searchNearBy()
         });
@@ -50,7 +50,7 @@ class DashboardActivities extends PureComponent{
 
                 return(
                     <Grid.Column key={index}>
-                        <Image src={img} size='tiny' wrapped/>
+                        <Image src={img} size='medium' wrapped/>
                         <span><Header as='h3'>{result.name}</Header></span>
                     </Grid.Column>
                 )
@@ -61,7 +61,7 @@ class DashboardActivities extends PureComponent{
                 <div></div>
             )
         }
-    }
+    };
 
     searchNearBy = () => {
         const params = {
@@ -96,11 +96,9 @@ class DashboardActivities extends PureComponent{
 
     render() {
         return(
-            <Grid>
-                <Grid.Row>
-                    {this.generateItem()}
-                </Grid.Row>
-            </Grid>    
+            <Grid.Row>
+                {this.generateItem()}
+            </Grid.Row>
         )
     }
 }
