@@ -19,6 +19,9 @@ import shopping from '../assets/images/shopping.png';
 import coffee from '../assets/images/coffee-n-tea.png';
 import place from '../assets/images/default.png';
 import PlaceDetails from './PlaceDetails';
+// import building from '../assets/images/building.png';
+// import university from '../assets/images/university.png';
+// import shirtsinbulk from '../assets/images/shirtsinbulk.png';
 
 const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZSJ9.IRSxzzNjXV8Wc5sQ73i7lQ';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
@@ -175,20 +178,44 @@ class Map extends Component {
                         <Divider hidden/>
 
                         <Grid>
-                            <Grid.Column>
-                                <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
-                                    <Icon circular inverted color='teal' name='food'/>
-                                </Button>
-                                <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
-                                    <Icon circular inverted color='teal' name='coffee'/>
-                                </Button>
-                                <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
-                                    <Icon circular inverted color='teal' name='hotel'/>
-                                </Button>
-                                <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                                    <Icon circular inverted color='teal' name='shopping cart'/>
-                                </Button>
-                            </Grid.Column>
+                            <Grid.Row>
+                                <Grid.Column>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                                        <Icon circular inverted color='teal' name='food'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('cafe')}>
+                                        <Icon circular inverted color='teal' name='coffee'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('lodging')}>
+                                        <Icon circular inverted color='teal' name='hotel'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                        <Icon circular inverted color='teal' name='shopping cart'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('tourist_attraction')}>
+                                        <Icon circular inverted color='teal' name='camera retro'/>
+                                    </Button>
+                                </Grid.Column>
+                            </Grid.Row>
+                            <Grid.Row>
+                                <Grid.Column>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('gas_station')}>
+                                        <Icon circular inverted color='teal' name='food'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('art_gallery')}>
+                                        <Icon circular inverted color='teal' name='coffee'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('clothing_store')}>
+                                        <Icon circular inverted color='teal' name='shirtsinbulk'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('museum')}>
+                                        <Icon circular inverted color='teal' name='university'/>
+                                    </Button>
+                                    <Button icon color='teal' onClick={() => this.searchByKeyword('shopping_mall')}>
+                                        <Icon circular inverted color='teal' name='building'/>
+                                    </Button>
+                                </Grid.Column>
+                            </Grid.Row>
                         </Grid>
                     </div>
                     )}
@@ -269,6 +296,21 @@ class Map extends Component {
                 icon = shopping;
                 break;
             }
+
+            // case 'clothing_store': {
+            //     icon = shirtsinbulk;
+            //     break;
+            // }
+
+            // case 'museum': {
+            //     icon = university;
+            //     break;
+            // }
+
+            // case 'shopping_mall': {
+            //     icon = building;
+            //     break;
+            // }
 
             default: {
                 icon = place;
