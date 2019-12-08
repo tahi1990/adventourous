@@ -29,7 +29,7 @@ class Wishlist extends PureComponent{
         }
 
         return (
-            <List.Item>
+            <List.Item key={wishlist.place}>
                 <List.Content>
                     <Image src={image} fluid/>
                     <List.Header as='h3'>{wishlist.name}</List.Header>
@@ -37,34 +37,6 @@ class Wishlist extends PureComponent{
                 </List.Content>
             </List.Item>
         )
-        // const image =
-        // const user = JSON.parse(localStorage.getItem('user'));
-        //
-        // userService.getUser(user.id).then((data) => {
-        //     console.log(data);
-        //     let results = data.wishlist;
-        //
-        //     if(results) {
-        //         if(results.length > 2)
-        //         results = results.slice(results.length - 2);
-        //
-        //         return results.map((result, index) => {
-        //             result.imageURL = GOOGLE_PLACE_PHOTO_REQ
-        //                             + result.image + '&key='
-        //                             + GOOGLE_API_KEY;
-        //
-        //             let img = result.imageURL ? result.imageURL : placeholder;
-        //             return(
-        //                 <Grid.Column key={index}>
-        //                     <Image src={img} size='medium' wrapped/>
-        //                     <span><Header as='h3'>{result.name}</Header></span>
-        //                     <span>{result.address}</span>
-        //                 </Grid.Column>
-        //             )
-        //         })
-        //     }
-        //
-        // })
     };
 
     render(){
