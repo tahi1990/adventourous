@@ -21,7 +21,7 @@ class Places extends PureComponent {
                     <Item.Meta>{place.vicinity}</Item.Meta>
                     {/*<Item.Description>Address: {place.vicinity}</Item.Description>*/}
                     <Item.Extra>
-                        <Rating maxRating={5} defaultRating={parseInt(place.rating)} icon='star' size='mini'/>({place.rating})
+                        <Rating disabled maxRating={5} defaultRating={parseInt(place.rating)} icon='star' size='mini'/>({place.rating})
                     </Item.Extra>
                 </Item.Content>
             </Item>

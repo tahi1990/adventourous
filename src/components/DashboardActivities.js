@@ -12,7 +12,7 @@ class DashboardActivities extends PureComponent{
 
     componentDidMount () {
         this.setState({ mounted: true });
-        if(this.props.place_id){
+        if(this.props.data && this.props.data.place_id) {
             this.requestPlace(this.props.data.place_id).then((data) => {
                 this.setState({
                     lat: data.result.geometry.location.lat,
@@ -23,8 +23,8 @@ class DashboardActivities extends PureComponent{
                 });
             });
         }
+
         if(this.props.data.lat && this.props.data.lng){
-            console.log('2222')
             this.setState({
                 lat: this.props.data.lat,
                 lng: this.props.data.lng,
@@ -48,13 +48,14 @@ class DashboardActivities extends PureComponent{
                                     + GOOGLE_API_KEY;
                 
                 let img = result.image ? result.image : placeholder;
+                result.rating = result.rating ? result.rating : 0;
 
                 return(
                     <Grid.Column key={index}>
                         <Image src={img} fluid/>
                         <span><Header as='h3'>{result.name}</Header></span>
-                        <span>{result.vicinity}</span>
-                        <Rating maxRating={5} defaultRating={parseInt(result.rating)} icon='star' size='mini'/>({result.rating})
+                        <span>{result.vicinity}</span><br/>
+                        <Rating disabled maxRating={5} defaultRating={parseInt(result.rating)} icon='star' size='mini'/>({result.rating})
                     </Grid.Column>
                 )
             })
