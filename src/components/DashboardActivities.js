@@ -8,39 +8,31 @@ const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 class DashboardActivities extends PureComponent{
     state ={
         mounted:false
-    }
-
-    constructor(props){
-        super(props);
-        console.log(props)
-        if(props.place_id){
-            console.log('1111')
-            this.requestPlace(props.data.place_id).then((data) => {           
-                this.setState({
-                    lat: data.result.geometry.location.lat,
-                    lng: data.result.geometry.location.lng,
-                    keyword: props.data.keyword
-                });
-    
-                this.searchNearBy()
-            });
-        }
-        if(props.data.lat && props.data.lng){
-            console.log('2222')
-            this.setState({
-                lat: props.data.lat,
-                lng: props.data.lng,
-                keyword: props.data.keyword
-            }, () => {
-                console.log('after set')
-                console.log(this.state)
-                this.searchNearBy()
-            })
-        }
-    }
+    };
 
     componentDidMount () {
         this.setState({ mounted: true });
+        if(this.props.place_id){
+            this.requestPlace(this.props.data.place_id).then((data) => {
+                this.setState({
+                    lat: data.result.geometry.location.lat,
+                    lng: data.result.geometry.location.lng,
+                    keyword: this.props.data.keyword
+                }, () => {
+                    this.searchNearBy();
+                });
+            });
+        }
+        if(this.props.data.lat && this.props.data.lng){
+            console.log('2222')
+            this.setState({
+                lat: this.props.data.lat,
+                lng: this.props.data.lng,
+                keyword: this.props.data.keyword
+            }, () => {
+                this.searchNearBy();
+            })
+        }
     }
 
     generateItem = () => {
@@ -75,9 +67,7 @@ class DashboardActivities extends PureComponent{
     };
 
     searchNearBy = () => {
-        console.log('search here')
-        console.log(this.state)
-        if(this.state.lat && this.stat.lng){
+        if(this.state.lat && this.state.lng){
             const params = {
                 location: this.state.lat + ',' + this.state.lng,
                 radius: 2000,
@@ -94,7 +84,7 @@ class DashboardActivities extends PureComponent{
                     })
                 })
         }
-    }
+    };
 
     requestPlace = (id) => {
         const params = {
