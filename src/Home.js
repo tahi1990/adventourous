@@ -147,31 +147,49 @@ class Home extends React.Component{
                                 )}
                                 {(!this.state.place_id && this.state.point) && (
                                     <div>
-                                        <Grid.Row>
-                                            <label>Tourist attraction</label>
-                                            <Grid columns={4} divided>
-                                                <DashboardActivities data={{lat: this.state.point.lat,
-                                                                            lng: this.state.point.lng, 
-                                                                            keyword: 'tourist_attraction'}}/>
-                                            </Grid>
-                                        </Grid.Row>
-                                        <Grid.Row>
-                                            <label>Restaurant</label>
-                                            <Grid columns={4} divided>
-                                                <DashboardActivities data={{lat: this.state.point.lat,
-                                                                            lng: this.state.point.lng, 
-                                                                            keyword: 'restaurant'}}/>
-                                            </Grid>
-                                        </Grid.Row>
-                                        <Grid.Row>
-                                            <label>Hotel</label>
-                                            <Grid columns={4} divided>
-                                                <DashboardActivities data={{lat: this.state.point.lat,
-                                                                            lng: this.state.point.lng, 
-                                                                            keyword: 'hotel'}}/>
-                                            </Grid>
-                                        </Grid.Row>
-                                    </div>
+                                    <Card fluid>
+                                        <Card.Content>
+                                            <Card.Header>Tourist attraction</Card.Header>
+                                            <Card.Description>
+                                                <Container>
+                                                <Grid columns={4}>
+                                                    <DashboardActivities data={{lat: this.state.point.lat,
+                                                                                lng: this.state.point.lng, 
+                                                                                keyword: 'tourist_attraction'}}/>
+                                                </Grid>
+                                                </Container>
+                                            </Card.Description>
+                                        </Card.Content>
+                                    </Card>
+                                    <Card fluid>
+                                        <Card.Content>
+                                            <Card.Header>Restaurant</Card.Header>
+                                            <Card.Description>
+                                                <Container>
+                                                    <Grid columns={4}>
+                                                        <DashboardActivities data={{lat: this.state.point.lat,
+                                                                                    lng: this.state.point.lng,
+                                                                                    keyword: 'restaurant'}}/>
+                                                    </Grid>
+                                                </Container>
+                                            </Card.Description>
+                                        </Card.Content>
+                                    </Card>
+                                    <Card fluid>
+                                        <Card.Content>
+                                            <Card.Header>Hotel</Card.Header>
+                                            <Card.Description>
+                                                <Container>
+                                                    <Grid columns={4}>
+                                                        <DashboardActivities data={{lat: this.state.point.lat,
+                                                                                    lng: this.state.point.lng, 
+                                                                                    keyword: 'hotel'}}/>
+                                                    </Grid>
+                                                </Container>
+                                            </Card.Description>
+                                        </Card.Content>
+                                    </Card>
+                                </div>
                                 )}
                             </Grid.Column>
                         </Grid>
