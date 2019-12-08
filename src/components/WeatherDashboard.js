@@ -44,49 +44,49 @@ class WeatherDashboard extends PureComponent{
     }
 
     render() {
-      // const weatherData = this.props.data;
-      const weatherData = {
-        "coord": {
-          "lon": 106.7,
-          "lat": 10.78
-        },
-        "weather": [
-          {
-            "id": 802,
-            "main": "Clouds",
-            "description": "scattered clouds",
-            "icon": "03d"
-          }
-        ],
-        "base": "stations",
-        "main": {
-          "temp": 29,
-          "pressure": 1011,
-          "humidity": 48,
-          "temp_min": 29,
-          "temp_max": 29
-        },
-        "visibility": 10000,
-        "wind": {
-          "speed": 2.1,
-          "deg": 310
-        },
-        "clouds": {
-          "all": 40
-        },
-        "dt": 1575711011,
-        "sys": {
-          "type": 1,
-          "id": 9314,
-          "country": "VN",
-          "sunrise": 1575673140,
-          "sunset": 1575714605
-        },
-        "timezone": 25200,
-        "id": 1566083,
-        "name": "Ho Chi Minh City",
-        "cod": 200
-      }
+      const weatherData = this.props.data;
+      // const weatherData = {
+      //   "coord": {
+      //     "lon": 106.7,
+      //     "lat": 10.78
+      //   },
+      //   "weather": [
+      //     {
+      //       "id": 802,
+      //       "main": "Clouds",
+      //       "description": "scattered clouds",
+      //       "icon": "03d"
+      //     }
+      //   ],
+      //   "base": "stations",
+      //   "main": {
+      //     "temp": 29,
+      //     "pressure": 1011,
+      //     "humidity": 48,
+      //     "temp_min": 29,
+      //     "temp_max": 29
+      //   },
+      //   "visibility": 10000,
+      //   "wind": {
+      //     "speed": 2.1,
+      //     "deg": 310
+      //   },
+      //   "clouds": {
+      //     "all": 40
+      //   },
+      //   "dt": 1575711011,
+      //   "sys": {
+      //     "type": 1,
+      //     "id": 9314,
+      //     "country": "VN",
+      //     "sunrise": 1575673140,
+      //     "sunset": 1575714605
+      //   },
+      //   "timezone": 25200,
+      //   "id": 1566083,
+      //   "name": "Ho Chi Minh City",
+      //   "cod": 200
+      // }
       return (
           <Card>
               <Card.Content>

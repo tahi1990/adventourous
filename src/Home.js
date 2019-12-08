@@ -5,6 +5,7 @@ import { Grid, Container, Card, Feed, Header, Divider } from 'semantic-ui-react'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import WeatherDashboard from './components/WeatherDashboard'
 import DashboardActivities from './components/DashboardActivities'
+import Wishlist from './components/Wishlist'
 
 import {
     Page,
@@ -116,6 +117,9 @@ class Home extends React.Component{
                                 )}
                             </Grid.Column>
                             <Grid.Column width={12}>
+                                {localStorage.getItem('user') && (
+                                    <Wishlist />
+                                )}
                                 {this.state.place_id &&(
                                     <div>
                                         <Grid.Row>
