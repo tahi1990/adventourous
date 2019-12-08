@@ -24,24 +24,17 @@ class Home extends React.Component{
 
     componentDidMount () {
         this.setState({ mounted: true });
+
+        navigator.geolocation.getCurrentPosition(position => {
+            this.setState({
+                point: {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                }
+            })
+        })
     }
-
-    searchNearBy = (lat, long, keyword) => {
-        const params = {
-            location: lat + ',' + long,
-            radius: 2000,
-            type: keyword,
-            key: GOOGLE_API_KEY
-        };
-
-        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-        fetch(url).then(res => res.json())
-            return(
-                <div></div>
-            )
-    }
-
+    
     handleSearch = (place_id, city) => {
         console.log(place_id)
         console.log(city)
@@ -83,12 +76,6 @@ class Home extends React.Component{
         return fetch(url).then(res => res.json());
     };
 
-    isLogin = () =>{
-        this.setState({
-            isLogin: true
-        })
-    }
-
     render() {
         return (
             <SiteWrapper>
@@ -118,14 +105,18 @@ class Home extends React.Component{
                             </Grid.Column>
                             <Grid.Column width={12}>
                                 {localStorage.getItem('user') && (
-                                    <Wishlist />
+                                    <Grid.Row>
+                                        <Wishlist />
+                                    </Grid.Row>
                                 )}
                                 {this.state.place_id &&(
                                     <div>
                                         <Grid.Row>
                                             <label>Tourist attraction</label>
                                             <Grid columns={4} divided>
-                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
+                                                <DashboardActivities data={{place_id: this.state.place_id,
+                                                                            // location: this.state.point,
+                                                                            keyword: 'tourist_attraction'}}/>
                                             </Grid>
                                         </Grid.Row>
                                         <Grid.Row>
@@ -142,7 +133,34 @@ class Home extends React.Component{
                                         </Grid.Row>
                                     </div>
                                 )}
-                                
+                                {(!this.state.place_id && this.state.point) && (
+                                    <div>
+                                        <Grid.Row>
+                                            <label>Tourist attraction</label>
+                                            <Grid columns={4} divided>
+                                                <DashboardActivities data={{lat: this.state.point.lat,
+                                                                            lng: this.state.point.lng, 
+                                                                            keyword: 'tourist_attraction'}}/>
+                                            </Grid>
+                                        </Grid.Row>
+                                        <Grid.Row>
+                                            <label>Restaurant</label>
+                                            <Grid columns={4} divided>
+                                                <DashboardActivities data={{lat: this.state.point.lat,
+                                                                            lng: this.state.point.lng, 
+                                                                            keyword: 'restaurant'}}/>
+                                            </Grid>
+                                        </Grid.Row>
+                                        <Grid.Row>
+                                            <label>Hotel</label>
+                                            <Grid columns={4} divided>
+                                                <DashboardActivities data={{lat: this.state.point.lat,
+                                                                            lng: this.state.point.lng, 
+                                                                            keyword: 'hotel'}}/>
+                                            </Grid>
+                                        </Grid.Row>
+                                    </div>
+                                )}
                             </Grid.Column>
                         </Grid>
                     </Container>

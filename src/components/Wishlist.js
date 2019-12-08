@@ -24,6 +24,8 @@ class Wishlist extends PureComponent{
 
     loadWishlist = () => {
         userService.getUser(this.state.user).then((data) => {
+            console.log('wishList')
+            console.log(data)
             let results = data.wishlist
 
             if(results){

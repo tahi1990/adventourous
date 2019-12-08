@@ -12,20 +12,31 @@ class DashboardActivities extends PureComponent{
 
     constructor(props){
         super(props);
-        //console.log(props)
-        // this.setState({
-        //     keyword: props.data.keyword
-        // });
-
-        this.requestPlace(props.data.place_id).then((data) => {           
-            this.setState({
-                lat: data.result.geometry.location.lat,
-                lng: data.result.geometry.location.lng,
-                keyword: props.data.keyword
+        console.log(props)
+        if(props.place_id){
+            console.log('1111')
+            this.requestPlace(props.data.place_id).then((data) => {           
+                this.setState({
+                    lat: data.result.geometry.location.lat,
+                    lng: data.result.geometry.location.lng,
+                    keyword: props.data.keyword
+                });
+    
+                this.searchNearBy()
             });
-
-            this.searchNearBy()
-        });
+        }
+        if(props.data.lat && props.data.lng){
+            console.log('2222')
+            this.setState({
+                lat: props.data.lat,
+                lng: props.data.lng,
+                keyword: props.data.keyword
+            }, () => {
+                console.log('after set')
+                console.log(this.state)
+                this.searchNearBy()
+            })
+        }
     }
 
     componentDidMount () {
@@ -66,21 +77,25 @@ class DashboardActivities extends PureComponent{
     };
 
     searchNearBy = () => {
-        const params = {
-            location: this.state.lat + ',' + this.state.lng,
-            radius: 2000,
-            type: this.state.keyword,
-            key: GOOGLE_API_KEY
-        };
-
-        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-        return fetch(url).then(res => res.json())
-            .then((data) => {
-                this.setState({
-                    data: data.results
+        console.log('search here')
+        console.log(this.state)
+        if(this.state.lat && this.stat.lng){
+            const params = {
+                location: this.state.lat + ',' + this.state.lng,
+                radius: 2000,
+                type: this.state.keyword,
+                key: GOOGLE_API_KEY
+            };
+    
+            const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
+            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+            return fetch(url).then(res => res.json())
+                .then((data) => {
+                    this.setState({
+                        data: data.results
+                    })
                 })
-            })
+        }
     }
 
     requestPlace = (id) => {
