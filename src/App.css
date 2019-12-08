@@ -68,4 +68,10 @@ i.icon {
   color: inherit !important;
 }
 
-
+.ui.fluid.image {
+  height: 130px !important;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-bottom: 10px;
+}

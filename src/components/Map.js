@@ -259,7 +259,7 @@ class Map extends Component {
     addToWishlist = () => {
         const place = this.state.place;
 
-        const user = JSON.parse(localStorage.getItem('user'));
+        let user = JSON.parse(localStorage.getItem('user'));
         const check = _.some(user.wishlist, function(e) {
             return e.place === place.id;
         });
@@ -275,7 +275,7 @@ class Map extends Component {
                 lat: place.geometry.lat,
                 lng: place.geometry.lng,
                 address: place.formatted_address,
-                image: place.photos && place.photos.length > 0 ? place.photos[0].photo_reference : ''
+                image: place.photos && place.photos.length > 0 ? place.photos[0].photo_reference : null
             };
 
             user.wishlist.push(obj);

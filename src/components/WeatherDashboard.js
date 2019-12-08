@@ -1,11 +1,14 @@
 import React, { PureComponent, Component } from 'react'
-import { Card, Grid, Header, List, Image } from 'semantic-ui-react'
-import { string } from 'prop-types';
+import { Card, Grid, Header, List, Image, Icon } from 'semantic-ui-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 
-const OPEN_WEATHER_URL = 'http://openweathermap.org/img/wn/'
+const OPEN_WEATHER_URL = 'http://openweathermap.org/img/wn/';
 
 class WeatherDashboard extends PureComponent{
-    state={}
+    state = {
+
+    };
 
     componentDidMount () {
       this.setState({ mounted: true });
@@ -16,13 +19,9 @@ class WeatherDashboard extends PureComponent{
     }
 
     DateTimeStr = (datetime) => {
-        var str = datetime.substring(8,10) + '.' + datetime.substring(5,7) //+ '.' + datetime.substring(0,4)
+        const str = datetime.substring(8,10) + '.' + datetime.substring(5,7); //+ '.' + datetime.substring(0,4)
         return str
-    }
-
-    getWeatherIcon(icon){
-        return OPEN_WEATHER_URL + icon + '@2x.png'
-    }
+    };
 
     createForecastDate = (data) => {
         return (
@@ -30,10 +29,9 @@ class WeatherDashboard extends PureComponent{
                 {this.DateTimeStr(data.dt_txt)}
             </Grid.Column>
         )
-    }
+    };
 
     createForeCastData = (data) => {
-        console.log(data)
         return (
             <Grid.Column>
                 <Image src={this.getWeatherIcon(data.weather[0].icon)} size='small' />
@@ -41,7 +39,7 @@ class WeatherDashboard extends PureComponent{
                 <span><font size="-1">{Math.round(data.main.temp)}&deg;C</font></span>
             </Grid.Column>
         )
-    }
+    };
 
     render() {
       const weatherData = this.props.data;
@@ -89,44 +87,38 @@ class WeatherDashboard extends PureComponent{
       // }
       return (
           <Card>
-              <Card.Content>
-                  <Grid divided='vertically'>
-                      <Grid.Row verticalAlign='middle'>
-                        <Grid.Column>
-                          <Header as='h3'>{weatherData.name}</Header>
-                        </Grid.Column>
-                        
-                          {/* <Grid.Column textAlign='left' verticalAlign='middle'>
-                              <Header as='h3'>{weatherData.name}</Header>
-                          </Grid.Column>
-                          <Grid.Column textAlign='right' verticalAlign='middle'>
-                              {/* {this.DateTimeStr(weatherForecastData.list[0].dt_txt)}
-                          </Grid.Column> */}
-                      </Grid.Row>
-                      <Grid.Row columns={2}>
-                          <Grid.Column textAlign='left' width={5}>
-                              <img  height={60} width={60} src={this.getWeatherIcon(weatherData.weather[0].icon)} />
-                          </Grid.Column>
-                          <Grid.Column textAlign='left' width={9}>
-                              <List>
-                                  <List.Item>Temp: {Math.round(weatherData.main.temp)}&deg;C</List.Item>
-                                  <List.Item>Humidity: {weatherData.main.humidity}&#37;</List.Item>
-                                  <List.Item>Wind: {weatherData.wind.speed} m/s</List.Item>
-                              </List>
-                          </Grid.Column>
-                      </Grid.Row>
-                  </Grid>
-              </Card.Content>
-              {/* <Card.Content>
-                  <Grid>
-                  <Grid.Row columns={3}>
-                      {foreCastData.map(this.createForecastDate)}
-                  </Grid.Row>
-                  <Grid.Row columns={3}>
-                      {foreCastData.map(this.createForeCastData)}
-                  </Grid.Row>
-                  </Grid>
-              </Card.Content> */}
+              { weatherData && weatherData.weather.length > 0 && (
+                  <Card.Content>
+                      <Image
+                          floated='right'
+                          size='mini'
+                          src={this.getWeatherIcon(weatherData.weather[0].icon)}
+                      />
+                      <Card.Header>{weatherData.name}</Card.Header>
+                      <Card.Description>
+                          <List>
+                              <List.Item>
+                                  <List.Content>
+                                      <Icon name='thermometer' />
+                                      Temp: {Math.round(weatherData.main.temp)}&deg;C
+                                  </List.Content>
+                              </List.Item>
+                              <List.Item>
+                                  <Icon name='tint' />
+                                  <List.Content>
+                                      Humidity: {weatherData.main.humidity}&#37;
+                                  </List.Content>
+                              </List.Item>
+                              <List.Item>
+                                  <Icon name='arrow up' />
+                                  <List.Content>
+                                      Wind: {weatherData.wind.speed} m/s
+                                  </List.Content>
+                              </List.Item>
+                          </List>
+                      </Card.Description>
+                  </Card.Content>
+              )}
           </Card>
       );
     }
