@@ -34,13 +34,11 @@ class DashboardActivities extends PureComponent{
 
     generateItem = () => {
         if(this.state.data){
-            var results = this.state.data
-            console.log(results[0])
+            let results = this.state.data;
             if(results.length > 4)
-                results = results.slice(results.length - 4)
+                results = results.slice(results.length - 4);
             
             return results.map((result, index) => {
-                console.log(result)
                 if(result.photos)
                     result.image = GOOGLE_PLACE_PHOTO_REQ
                                     + result.photos[0].photo_reference + '&key='
@@ -50,7 +48,7 @@ class DashboardActivities extends PureComponent{
 
                 return(
                     <Grid.Column key={index}>
-                        <Image src={img} size='medium' wrapped/>
+                        <Image src={img} fluid/>
                         <span><Header as='h3'>{result.name}</Header></span>
                         <span>{result.vicinity}</span>
                         <Rating maxRating={5} defaultRating={parseInt(result.rating)} icon='star' size='mini'/>({result.rating})

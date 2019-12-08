@@ -5,6 +5,9 @@
   "dependencies": {
     "@deck.gl/layers": "^7.3.6",
     "@deck.gl/react": "^7.3.6",
+    "@fortawesome/fontawesome-svg-core": "^1.2.25",
+    "@fortawesome/free-solid-svg-icons": "^5.11.2",
+    "@fortawesome/react-fontawesome": "^0.1.8",
     "deck.gl": "^7.3.6",
     "lodash": "^4.17.15",
     "rc-drawer": "^3.0.2",

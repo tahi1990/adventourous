@@ -38,19 +38,19 @@ class Home extends React.Component{
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             return(
-                <div></div>
+                <div>
+
+                </div>
             )
-    }
+    };
 
     handleSearch = (place_id, city) => {
-        console.log(place_id)
-        console.log(city)
         this.setState({
             place_id: place_id
-        })
+        });
 
         this.loadWeatherData(city)
-    }
+    };
 
     loadWeatherData = (city) => {
         const params = {
@@ -83,20 +83,13 @@ class Home extends React.Component{
         return fetch(url).then(res => res.json());
     };
 
-    isLogin = () =>{
-        this.setState({
-            isLogin: true
-        })
-    }
-
     render() {
         return (
             <SiteWrapper>
                 <Page.Content title="Dashboard">
 
-                    <Container>
+                    <div>
                         <GooglePlacesAutocomplete
-                            //onSelect = {console.log}
                             onSelect = {({ place_id, structured_formatting }) => (
                                 this.handleSearch(place_id, structured_formatting.main_text)
                             )}
@@ -105,47 +98,66 @@ class Home extends React.Component{
                             }}
                             placeholder='City'
                         />
-                    </Container>
+                    </div>
 
                     <Divider />
 
-                    <Container>
+                    <div>
                         <Grid>  
                             <Grid.Column width={4}>
-                                {this.state.weatherData && (
+                                { this.state.weatherData && (
                                     <WeatherDashboard data={this.state.weatherData}/>
+                                )}
+
+                                { localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).wishlist.length > 0 && (
+                                    <Wishlist />
                                 )}
                             </Grid.Column>
                             <Grid.Column width={12}>
-                                {localStorage.getItem('user') && (
-                                    <Wishlist />
-                                )}
                                 {this.state.place_id &&(
                                     <div>
-                                        <Grid.Row>
-                                            <label>Tourist attraction</label>
-                                            <Grid columns={4} divided>
-                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
-                                            </Grid>
-                                        </Grid.Row>
-                                        <Grid.Row>
-                                            <label>Restaurant</label>
-                                            <Grid columns={4} divided>
-                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'restaurant'}}/>
-                                            </Grid>
-                                        </Grid.Row>
-                                        <Grid.Row>
-                                            <label>Hotel</label>
-                                            <Grid columns={4} divided>
-                                                <DashboardActivities data={{place_id: this.state.place_id, keyword: 'hotel'}}/>
-                                            </Grid>
-                                        </Grid.Row>
+                                        <Card fluid>
+                                            <Card.Content>
+                                                <Card.Header>Tourist attraction</Card.Header>
+                                                <Card.Description>
+                                                    <Container>
+                                                    <Grid columns={4}>
+                                                        <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
+                                                    </Grid>
+                                                    </Container>
+                                                </Card.Description>
+                                            </Card.Content>
+                                        </Card>
+                                        <Card fluid>
+                                            <Card.Content>
+                                                <Card.Header>Restaurant</Card.Header>
+                                                <Card.Description>
+                                                    <Container>
+                                                        <Grid columns={4}>
+                                                            <DashboardActivities data={{place_id: this.state.place_id, keyword: 'restaurant'}}/>
+                                                        </Grid>
+                                                    </Container>
+                                                </Card.Description>
+                                            </Card.Content>
+                                        </Card>
+                                        <Card fluid>
+                                            <Card.Content>
+                                                <Card.Header>Hotel</Card.Header>
+                                                <Card.Description>
+                                                    <Container>
+                                                        <Grid columns={4}>
+                                                            <DashboardActivities data={{place_id: this.state.place_id, keyword: 'hotel'}}/>
+                                                        </Grid>
+                                                    </Container>
+                                                </Card.Description>
+                                            </Card.Content>
+                                        </Card>
                                     </div>
                                 )}
                                 
                             </Grid.Column>
                         </Grid>
-                    </Container>
+                    </div>
                 </Page.Content>
             </SiteWrapper>
         )
