@@ -31,7 +31,7 @@ class Home extends React.Component{
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 }
-            })
+            }, this.loadWeatherDataByCurLatLong)
         })
     }
     
@@ -46,6 +46,25 @@ class Home extends React.Component{
     loadWeatherData = (city) => {
         const params = {
             q: city,
+            units: 'metric',
+            appid: OPEN_WEATHER_API_KEY
+        };
+  
+        const url = new URL(OPEN_WEATHER_API_URL);
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        fetch(url).then(res => res.json())
+            .then((data)=>{
+                console.log(data)
+                this.setState({
+                  weatherData: data
+                })
+            });
+    };
+
+    loadWeatherDataByCurLatLong = () => {
+        const params = {
+            lat: this.state.point.lat,
+            lon: this.state.point.lng,
             units: 'metric',
             appid: OPEN_WEATHER_API_KEY
         };
