@@ -16,7 +16,7 @@ import SiteWrapper from '../SiteWrapper';
 const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14';
 const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
-const SERVER_URL = 'http://localhost:5000';
+const SERVER_URL = 'https://adventourous.sodo.asia/server';
 
 class Home extends React.Component{
     state = {
@@ -187,7 +187,9 @@ class Home extends React.Component{
                                 )}
                             </Grid.Column>
                             <Grid.Column width={12}>
-                                {this.state.tourist && (
+
+                                {console.log('tourist' + this.state.tourist)}
+                                {this.state.tourist && this.state.tourist.length > 0 && (
                                 <Card fluid>
                                     <Card.Content>
                                         <Card.Header>Tourist attraction</Card.Header>
@@ -200,7 +202,7 @@ class Home extends React.Component{
                                         </Card.Description>
                                     </Card.Content>
                                 </Card>)}
-                                {this.state.restaurant && (
+                                {this.state.restaurant && this.state.restaurant.length > 0 && (
                                 <Card fluid>
                                     <Card.Content>
                                         <Card.Header>Restaurant</Card.Header>
@@ -213,7 +215,7 @@ class Home extends React.Component{
                                         </Card.Description>
                                     </Card.Content>
                                 </Card>)}
-                                {this.state.hotel && (
+                                {this.state.hotel && this.state.hotel.length > 0 &&(
                                 <Card fluid>
                                     <Card.Content>
                                         <Card.Header>Hotel</Card.Header>

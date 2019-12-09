@@ -7,7 +7,7 @@ export const userService = {
     // logout
 };
 
-const URL = process.env.SERVER_URI || `http://localhost:5000`;
+const URL = process.env.SERVER_URI || `https://adventourous.sodo.asia/server`;
 
 function addUser(user) {
     return fetch(`${URL}/api/user`, {

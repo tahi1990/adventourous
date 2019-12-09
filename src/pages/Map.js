@@ -32,7 +32,7 @@ const TOKEN = 'pk.eyJ1IjoidGFoaTE5OTAiLCJhIjoiY2szNzZ4eWlpMDhxdTNjbzltMGJvYzAzZS
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 const OPEN_WEATHER_API_KEY = '8df63dbda6463515fcd2bcd1b81c2f14';
 const OPEN_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
-const SERVER_URL = 'http://localhost:5000';
+const SERVER_URL = 'https://adventourous.sodo.asia/server';
 
 const style = {
     position: 'absolute',
