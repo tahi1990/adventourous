@@ -73,6 +73,18 @@ class SiteWrapper extends React.Component<Props, State> {
         accountDropdownProps: null
     };
 
+    componentDidMount(): void {
+        const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+
+        if(user) {
+            userService.getUser(user.id).then(data => {
+                if(data && data.user) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                }
+            });
+        }
+    }
+
     toggle = () => {
         this.setState({
             open: !this.state.open,

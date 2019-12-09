@@ -3,7 +3,7 @@ import MapGL, { Marker, Popup, NavigationControl, FullscreenControl, GeolocateCo
 import DeckGL, { PathLayer } from "deck.gl";
 import SiteWrapper from '../SiteWrapper';
 import Drawer from 'rc-drawer';
-import { Container, Header, Grid, Button, Icon, Dimmer, Loader, Divider, Modal, Image, Input } from 'semantic-ui-react'
+import { Container, Header, Grid, Button, Icon, Dimmer, Loader, Divider, Modal, Image, Input, Popup as SemanticPopup } from 'semantic-ui-react'
 import "rc-drawer/assets/index.css";
 import Places from '../components/Places';
 import Pin from '../components/Pin';
@@ -230,56 +230,66 @@ class Map extends Component {
                             <Grid columns={5}>
                                 <Grid.Row>
                                     <Grid.Column>
-                                        <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
-                                            <Icon circular inverted color='teal' name='food'/>
-                                        </Button>
+                                        <SemanticPopup content='Restaurants' trigger={
+                                            <Button icon color='teal' onClick={() => this.searchByKeyword('restaurant')}>
+                                                <Icon circular inverted color='teal' name='food'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='red' onClick={() => this.searchByKeyword('cafe')}>
-                                            <Icon circular inverted color='red' name='coffee'/>
-                                        </Button>
+                                        <SemanticPopup content='Cafes' trigger={
+                                            <Button icon color='red' onClick={() => this.searchByKeyword('cafe')}>
+                                                <Icon circular inverted color='red' name='coffee'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='blue' onClick={() => this.searchByKeyword('lodging')}>
-                                            <Icon circular inverted color='blue' name='hotel'/>
-                                        </Button>
+                                        <SemanticPopup content='Hotels' trigger={
+                                            <Button icon color='blue' onClick={() => this.searchByKeyword('lodging')}>
+                                                <Icon circular inverted color='blue' name='hotel'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='orange' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                                            <Icon circular inverted color='orange' name='shopping cart'/>
-                                        </Button>
+                                        <SemanticPopup content='Shopping' trigger={
+                                            <Button icon color='orange' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                                <Icon circular inverted color='orange' name='shopping cart'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='green' onClick={() => this.searchByKeyword('tourist_attraction')}>
-                                            <Icon circular inverted color='green' name='camera retro'/>
-                                        </Button>
+                                        <SemanticPopup content='Tourist Attraction' trigger={
+                                            <Button icon color='green' onClick={() => this.searchByKeyword('tourist_attraction')}>
+                                                <Icon circular inverted color='green' name='camera retro'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                 </Grid.Row>
                                 <Grid.Row>
                                     <Grid.Column>
-                                        <Button icon color='violet' onClick={() => this.searchByKeyword('gas_station')}>
-                                            <Icon circular inverted color='violet' name='tint'/>
-                                        </Button>
+                                        <SemanticPopup content='Gas Station' trigger={
+                                            <Button icon color='violet' onClick={() => this.searchByKeyword('gas_station')}>
+                                                <Icon circular inverted color='violet' name='tint'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='purple' onClick={() => this.searchByKeyword('art_gallery')}>
-                                            <Icon circular inverted color='purple' name='image'/>
-                                        </Button>
+                                        <SemanticPopup content='Art Galleries' trigger={
+                                            <Button icon color='purple' onClick={() => this.searchByKeyword('art_gallery')}>
+                                                <Icon circular inverted color='purple' name='image'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='pink' onClick={() => this.searchByKeyword('clothing_store')}>
-                                            <Icon circular inverted color='pink' name='shirtsinbulk'/>
-                                        </Button>
+                                        <SemanticPopup content='Clothing Stores' trigger={
+                                            <Button icon color='pink' onClick={() => this.searchByKeyword('clothing_store')}>
+                                                <Icon circular inverted color='pink' name='shirtsinbulk'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='brown' onClick={() => this.searchByKeyword('museum')}>
-                                            <Icon circular inverted color='brown' name='university'/>
-                                        </Button>
+                                        <SemanticPopup content='Universities' trigger={
+                                            <Button icon color='brown' onClick={() => this.searchByKeyword('museum')}>
+                                                <Icon circular inverted color='brown' name='university'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button icon color='olive' onClick={() => this.searchByKeyword('shopping_mall')}>
-                                            <Icon circular inverted color='olive' name='building'/>
-                                        </Button>
+                                        <SemanticPopup content='Shopping Mall' trigger={
+                                            <Button icon color='olive' onClick={() => this.searchByKeyword('shopping_mall')}>
+                                                <Icon circular inverted color='olive' name='building'/>
+                                            </Button>}/>
                                     </Grid.Column>
                                 </Grid.Row>
                         </Grid>

@@ -61,7 +61,6 @@ class Home extends React.Component{
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-                console.log(data)
                 this.setState({
                   weatherData: data
                 })
@@ -187,8 +186,6 @@ class Home extends React.Component{
                                 )}
                             </Grid.Column>
                             <Grid.Column width={12}>
-
-                                {console.log('tourist' + this.state.tourist)}
                                 {this.state.tourist && this.state.tourist.length > 0 && (
                                 <Card fluid>
                                     <Card.Content>
