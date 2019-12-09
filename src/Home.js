@@ -185,6 +185,7 @@ class Home extends React.Component{
                                 )}
                             </Grid.Column>
                             <Grid.Column width={12}>
+                                {this.state.tourist && (
                                 <Card fluid>
                                     <Card.Content>
                                         <Card.Header>Tourist attraction</Card.Header>
@@ -196,7 +197,8 @@ class Home extends React.Component{
                                             </Container>
                                         </Card.Description>
                                     </Card.Content>
-                                </Card>
+                                </Card>)}
+                                {this.state.restaurant && (
                                 <Card fluid>
                                     <Card.Content>
                                         <Card.Header>Restaurant</Card.Header>
@@ -208,7 +210,8 @@ class Home extends React.Component{
                                             </Container>
                                         </Card.Description>
                                     </Card.Content>
-                                </Card>
+                                </Card>)}
+                                {this.state.hotel && (
                                 <Card fluid>
                                     <Card.Content>
                                         <Card.Header>Hotel</Card.Header>
@@ -220,7 +223,7 @@ class Home extends React.Component{
                                             </Container>
                                         </Card.Description>
                                     </Card.Content>
-                                </Card>
+                                </Card>)}
                             </Grid.Column>
                         </Grid>
                     </div>
