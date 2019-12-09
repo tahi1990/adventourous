@@ -87,7 +87,7 @@ class WeatherDashboard extends PureComponent{
       // }
       return (
           <Card>
-              { weatherData && weatherData.weather.length > 0 && (
+              { weatherData && weatherData.weather && weatherData.weather.length > 0 && (
                   <Card.Content>
                       <Image
                           floated='right'

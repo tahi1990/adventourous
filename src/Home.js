@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react'
-import { Grid, Container, Card, Feed, Header, Divider } from 'semantic-ui-react'
+import {Grid, Container, Card, Feed, Header, Divider, Loader, Dimmer} from 'semantic-ui-react'
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import WeatherDashboard from './components/WeatherDashboard'
 import DashboardActivities from './components/DashboardActivities'
@@ -19,13 +19,17 @@ const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
 
 class Home extends React.Component{
     state = {
-        mounted:false
+        mounted:false,
+        loading: false
     };
 
     componentDidMount () {
         this.setState({ mounted: true });
 
         navigator.geolocation.getCurrentPosition(position => {
+            this.searchNearBy(position.coords.latitude, position.coords.longitude, 'tourist_attraction');
+            this.searchNearBy(position.coords.latitude, position.coords.longitude, 'restaurant');
+            this.searchNearBy(position.coords.latitude, position.coords.longitude, 'hotel');
             this.setState({
                 point: {
                     lat: position.coords.latitude,
@@ -36,11 +40,13 @@ class Home extends React.Component{
     }
     
     handleSearch = (place_id, city) => {
-        this.setState({
-            place_id: place_id
+        this.requestPlace(place_id).then(data => {
+           this.searchNearBy(data.result.geometry.location.lat, data.result.geometry.location.lng, 'tourist_attraction');
+           this.searchNearBy(data.result.geometry.location.lat, data.result.geometry.location.lng, 'restaurant');
+           this.searchNearBy(data.result.geometry.location.lat, data.result.geometry.location.lng, 'hotel');
         });
 
-        this.loadWeatherData(city)
+        this.loadWeatherData(city);
     };
 
     loadWeatherData = (city) => {
@@ -73,7 +79,6 @@ class Home extends React.Component{
         Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
         fetch(url).then(res => res.json())
             .then((data)=>{
-                console.log(data)
                 this.setState({
                   weatherData: data
                 })
@@ -93,10 +98,65 @@ class Home extends React.Component{
         return fetch(url).then(res => res.json());
     };
 
+    searchNearBy = (lat, lng, keyword) => {
+        const params = {
+            location: lat + ',' + lng,
+            radius: 2000,
+            type: keyword,
+            key: GOOGLE_API_KEY
+        };
+
+        this.setState({
+            loading: true
+        });
+
+        const url = new URL('https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json');
+        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        fetch(url).then(res => res.json())
+            .then(data => {
+                switch (keyword) {
+                    case 'tourist_attraction': {
+                        this.setState({
+                            tourist: data.results,
+                            loading: false
+                        });
+                        break;
+                    }
+
+                    case 'restaurant': {
+                        this.setState({
+                            restaurant: data.results,
+                            loading: false
+                        });
+                        break;
+                    }
+
+                    case 'hotel': {
+                        this.setState({
+                            hotel: data.results,
+                            loading: false
+                        });
+                        break;
+                    }
+
+                    default: {
+                        break;
+                    }
+                }
+
+            })
+    };
+
     render() {
+        const {loading} = this.state;
+
         return (
             <SiteWrapper>
                 <Page.Content title="Dashboard">
+
+                    <Dimmer inverted active={loading}>
+                        <Loader inverted size='medium'>Loading</Loader>
+                    </Dimmer>
 
                     <div>
                         <GooglePlacesAutocomplete
@@ -113,7 +173,8 @@ class Home extends React.Component{
                     <Divider />
 
                     <div>
-                        <Grid>  
+
+                        <Grid>
                             <Grid.Column width={4}>
                                 { this.state.weatherData && (
                                     <WeatherDashboard data={this.state.weatherData}/>
@@ -124,92 +185,42 @@ class Home extends React.Component{
                                 )}
                             </Grid.Column>
                             <Grid.Column width={12}>
-                                {this.state.place_id &&(
-                                    <div>
-                                        <Card fluid>
-                                            <Card.Content>
-                                                <Card.Header>Tourist attraction</Card.Header>
-                                                <Card.Description>
-                                                    <Container>
-                                                    <Grid columns={4}>
-                                                        <DashboardActivities data={{place_id: this.state.place_id, keyword: 'tourist_attraction'}}/>
-                                                    </Grid>
-                                                    </Container>
-                                                </Card.Description>
-                                            </Card.Content>
-                                        </Card>
-                                        <Card fluid>
-                                            <Card.Content>
-                                                <Card.Header>Restaurant</Card.Header>
-                                                <Card.Description>
-                                                    <Container>
-                                                        <Grid columns={4}>
-                                                            <DashboardActivities data={{place_id: this.state.place_id, keyword: 'restaurant'}}/>
-                                                        </Grid>
-                                                    </Container>
-                                                </Card.Description>
-                                            </Card.Content>
-                                        </Card>
-                                        <Card fluid>
-                                            <Card.Content>
-                                                <Card.Header>Hotel</Card.Header>
-                                                <Card.Description>
-                                                    <Container>
-                                                        <Grid columns={4}>
-                                                            <DashboardActivities data={{place_id: this.state.place_id, keyword: 'hotel'}}/>
-                                                        </Grid>
-                                                    </Container>
-                                                </Card.Description>
-                                            </Card.Content>
-                                        </Card>
-                                    </div>
-                                )}
-                                {(!this.state.place_id && this.state.point) && (
-                                    <div>
-                                    <Card fluid>
-                                        <Card.Content>
-                                            <Card.Header>Tourist attraction</Card.Header>
-                                            <Card.Description>
-                                                <Container>
+                                <Card fluid>
+                                    <Card.Content>
+                                        <Card.Header>Tourist attraction</Card.Header>
+                                        <Card.Description>
+                                            <Container>
+                                            <Grid columns={4}>
+                                                <DashboardActivities data={this.state.tourist}/>
+                                            </Grid>
+                                            </Container>
+                                        </Card.Description>
+                                    </Card.Content>
+                                </Card>
+                                <Card fluid>
+                                    <Card.Content>
+                                        <Card.Header>Restaurant</Card.Header>
+                                        <Card.Description>
+                                            <Container>
                                                 <Grid columns={4}>
-                                                    <DashboardActivities data={{lat: this.state.point.lat,
-                                                                                lng: this.state.point.lng, 
-                                                                                keyword: 'tourist_attraction'}}/>
+                                                    <DashboardActivities data={this.state.restaurant}/>
                                                 </Grid>
-                                                </Container>
-                                            </Card.Description>
-                                        </Card.Content>
-                                    </Card>
-                                    <Card fluid>
-                                        <Card.Content>
-                                            <Card.Header>Restaurant</Card.Header>
-                                            <Card.Description>
-                                                <Container>
-                                                    <Grid columns={4}>
-                                                        <DashboardActivities data={{lat: this.state.point.lat,
-                                                                                    lng: this.state.point.lng,
-                                                                                    keyword: 'restaurant'}}/>
-                                                    </Grid>
-                                                </Container>
-                                            </Card.Description>
-                                        </Card.Content>
-                                    </Card>
-                                    <Card fluid>
-                                        <Card.Content>
-                                            <Card.Header>Hotel</Card.Header>
-                                            <Card.Description>
-                                                <Container>
-                                                    <Grid columns={4}>
-                                                        <DashboardActivities data={{lat: this.state.point.lat,
-                                                                                    lng: this.state.point.lng, 
-                                                                                    keyword: 'hotel'}}/>
-                                                    </Grid>
-                                                </Container>
-                                            </Card.Description>
-                                        </Card.Content>
-                                    </Card>
-                                </div>
-                                )}
+                                            </Container>
+                                        </Card.Description>
+                                    </Card.Content>
+                                </Card>
+                                <Card fluid>
+                                    <Card.Content>
+                                        <Card.Header>Hotel</Card.Header>
+                                        <Card.Description>
+                                            <Container>
+                                                <Grid columns={4}>
+                                                    <DashboardActivities data={this.state.hotel}/>
+                                                </Grid>
+                                            </Container>
+                                        </Card.Description>
+                                    </Card.Content>
+                                </Card>
                             </Grid.Column>
                         </Grid>
                     </div>

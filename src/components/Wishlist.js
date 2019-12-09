@@ -14,7 +14,6 @@ class Wishlist extends PureComponent{
 
     constructor(props){
         super(props);
-        // this.loadWishlist()
     }
 
     loadWishlist = (wishlist) => {
