@@ -74,7 +74,7 @@ button.icon {
 
 .ui.fluid.image {
   height: 130px !important;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   margin-bottom: 10px;

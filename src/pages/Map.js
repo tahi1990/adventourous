@@ -380,7 +380,7 @@ class Map extends Component {
                                 image: marker.photos && marker.photos.length > 0 ? marker.photos[0].photo_reference : null
                             }
                         })} style={{transform: `translate(${-20 / 2}px,${-27}px)`}} height={27} width={20} src={marker.icon} alt="" />
-                    )};
+                    )}
 
                     { details && (
                         <Pin size={20} onClick={() => this.setState({
@@ -474,7 +474,7 @@ class Map extends Component {
                     },
                     search: false,
                     loading: false
-                })
+                }, () => this.loadWeatherData(this.state.viewport.latitude, this.state.viewport.longitude))
             });
     };
 
@@ -538,6 +538,15 @@ class Map extends Component {
                details: true,
                 search: false,
                loading: false,
+                viewport :{
+                    width: "100%",
+                    height: 600,
+                    latitude: data.result.geometry.location.lat,
+                    longitude: data.result.geometry.location.lng,
+                    zoom: 13,
+                    bearing: 0,
+                    pitch: 0
+                },
             }, () => {
                 const { match: { params } } = this.props;
                 if(params && params.id) {
