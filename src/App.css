@@ -46,8 +46,8 @@
   padding: 0;
 }
 
-.ui.modal {
-  bottom: auto;
+.sub.header {
+  border: none;
 }
 
 .mapboxgl-popup {
@@ -65,6 +65,10 @@
 }
 
 i.icon {
+  color: inherit !important;
+}
+
+button.icon {
   color: inherit !important;
 }
 

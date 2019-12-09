@@ -1,6 +1,7 @@
-import React, { PureComponent, Component } from 'react'
-import { Card, Grid, Header, Rating, Image } from 'semantic-ui-react'
-import placeholder from '../assets/images/placeholder.png';
+import React, { PureComponent } from 'react'
+import { Grid, Header, Rating, Image } from 'semantic-ui-react'
+import placeholder from '../assets/images/placeholder.png'
+import { Link } from "react-router-dom";
 
 const GOOGLE_PLACE_PHOTO_REQ = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference=';
 const GOOGLE_API_KEY = 'AIzaSyDT85pn4ikmOV8W7cqULptXomgW5U4bWYc';
@@ -27,8 +28,15 @@ class DashboardActivities extends PureComponent{
                 return(
                     <Grid.Column key={index}>
                         <Image src={img} fluid/>
-                        <span><Header as='h3'>{result.name}</Header></span>
-                        <span>{result.vicinity}</span><br/>
+                        <Header as='h3'>
+                            <Link to={`/maps/${result.place_id}`}>
+                                {result.name}
+                            </Link>
+                            <Header.Subheader>
+                                {result.vicinity}
+                            </Header.Subheader>
+                        </Header>
+
                         <Rating disabled maxRating={5} defaultRating={parseInt(result.rating)} icon='star' size='mini'/>({result.rating})
                     </Grid.Column>
                 )
@@ -36,7 +44,9 @@ class DashboardActivities extends PureComponent{
         }
         else{
             return(
-                <div></div>
+                <div>
+
+                </div>
             )
         }
     };

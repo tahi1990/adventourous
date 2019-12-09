@@ -58,7 +58,7 @@ const navBarItems: Array<navItem> = [
         to: "/maps",
         icon: "map",
         LinkComponent: NavLink,
-        useExact: true,
+        useExact: false,
     },
 ];
 
@@ -146,7 +146,7 @@ class SiteWrapper extends React.Component<Props, State> {
                     headerProps={{
                         href: "/",
                         alt: "Adventourous",
-                        imageURL: "./images/logo.png",
+                        imageURL: "../images/logo.png",
                         navItems: (
                             <Nav.Item type="div" className="d-none d-md-flex">
                                 { !localStorage.getItem('user') && (

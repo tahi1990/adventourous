@@ -44,6 +44,11 @@ class PlaceDetails extends PureComponent {
 
         const {active, type} = this.state;
 
+        data.rating = data.rating ? data.rating : 0;
+        if(data.rating === 0) {
+            data.user_ratings_total = 0;
+        }
+
         return(
             <div>
 
@@ -115,7 +120,7 @@ class PlaceDetails extends PureComponent {
                 { direction && (
                     <Accordion>
                         <Accordion.Title active={active} onClick={this.handleClick}>
-                            <Icon name='dropdown' />{type} - {direction[0].duration} ({direction[0].distance + 'm'})
+                            <Icon name='dropdown' />{type} - {Math.round(direction[0].duration/60/60)} hours {Math.round((direction[0].duration/60/60 - Math.round(direction[0].duration/60/60) )* 60)} mins - ({(direction[0].distance/1000).toFixed(2) + 'km'})
                         </Accordion.Title>
                         <Accordion.Content active={active}>
                             <List divided relaxed>

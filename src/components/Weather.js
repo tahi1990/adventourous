@@ -13,9 +13,9 @@ class Weather extends PureComponent{
 
         let icon = null;
         let weatherDes = null;
-        if (weatherData && weatherData.weather.length > 0) {
+        if (weatherData && weatherData.weather && weatherData.weather.length > 0) {
             icon = this.getWeatherIcon(weatherData.weather[0].icon);
-            weatherDes = Math.round(weatherData.main.temp) + '\u00B0' + "C";
+            weatherDes = Math.round(weatherData.main.temp) + "\u00B0C";
         }
         
         return (
