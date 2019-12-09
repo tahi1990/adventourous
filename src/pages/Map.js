@@ -21,9 +21,10 @@ import shopping from '../assets/images/shopping.png';
 import coffee from '../assets/images/coffee-n-tea.png';
 import place from '../assets/images/default.png';
 import PlaceDetails from '../components/PlaceDetails';
-// import building from '../assets/images/building.png';
-// import university from '../assets/images/university.png';
-// import shirtsinbulk from '../assets/images/shirtsinbulk.png';
+import building from '../assets/images/building.png';
+import museums from '../assets/images/museums.png';
+import fashion from '../assets/images/fashion.png';
+import automotive from '../assets/images/automotive.png';
 import {userService} from '../services';
 import placeholder from '../assets/images/placeholder.png';
 
@@ -428,20 +429,24 @@ class Map extends Component {
                 break;
             }
 
-            // case 'clothing_store': {
-            //     icon = shirtsinbulk;
-            //     break;
-            // }
+            case 'clothing_store': {
+                icon = fashion;
+                break;
+            }
 
-            // case 'museum': {
-            //     icon = university;
-            //     break;
-            // }
+            case 'museum': {
+                icon = museums;
+                break;
+            }
 
-            // case 'shopping_mall': {
-            //     icon = building;
-            //     break;
-            // }
+            case 'shopping_mall': {
+                icon = building;
+                break;
+            }
+            case 'gas_station': {
+                icon = automotive;
+                break;
+            }
 
             default: {
                 icon = place;
