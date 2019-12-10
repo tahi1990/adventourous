@@ -37,7 +37,7 @@ class Home extends React.Component{
                     lng: position.coords.longitude
                 }
             }, this.loadWeatherDataByCurLatLong)
-        })
+        });
     }
     
     handleSearch = (place_id, city) => {
@@ -174,9 +174,8 @@ class Home extends React.Component{
                     <Divider />
 
                     <div>
-
                         <Grid>
-                            <Grid.Column width={4}>
+                            <Grid.Column mobile={16} tablet={16} computer={4}>
                                 { this.state.weatherData && (
                                     <WeatherDashboard data={this.state.weatherData}/>
                                 )}
@@ -185,7 +184,7 @@ class Home extends React.Component{
                                     <Wishlist />
                                 )}
                             </Grid.Column>
-                            <Grid.Column width={12}>
+                            <Grid.Column mobile={16} tablet={16} computer={12}>
                                 {this.state.tourist && this.state.tourist.length > 0 && (
                                 <Card fluid>
                                     <Card.Content>

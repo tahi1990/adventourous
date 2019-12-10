@@ -26,7 +26,7 @@ class DashboardActivities extends PureComponent{
                 result.rating = result.rating ? result.rating : 0;
 
                 return(
-                    <Grid.Column key={index}>
+                    <Grid.Column key={index} mobile={16} tablet={8} computer={4}>
                         <Image src={img} fluid/>
                         <Header as='h3'>
                             <Link to={`/maps/${result.place_id}`}>

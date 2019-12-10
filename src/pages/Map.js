@@ -11,7 +11,7 @@ import _ from 'lodash';
 import Weather from '../components/Weather';
 import MarkerInfo from '../components/MarkerInfo';
 import loader from '../assets/loader.svg';
-import { toast } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
@@ -161,7 +161,7 @@ class Map extends Component {
 
                 { !search && (
                     <div>
-                        <Button onClick={this.backToSearch} basic color='blue' content='Back to search' icon='left arrow' labelPosition='left' />
+                        <Button onClick={this.backToSearch} basic color='blue' content='Search' icon='left arrow' labelPosition='left' />
                         { details && localStorage.getItem('user') && !place.wish && (
                             <Button floated='right' onClick={this.addToWishlist} basic color='red' icon='bookmark outline' />
                         )}
@@ -227,7 +227,7 @@ class Map extends Component {
                         <Divider hidden/>
 
                         <Container>
-                            <Grid columns={5}>
+                            <Grid columns={3}>
                                 <Grid.Row>
                                     <Grid.Column>
                                         <SemanticPopup content='Restaurants' trigger={
@@ -247,18 +247,12 @@ class Map extends Component {
                                                 <Icon circular inverted color='blue' name='hotel'/>
                                             </Button>}/>
                                     </Grid.Column>
-                                    <Grid.Column>
-                                        <SemanticPopup content='Shopping' trigger={
-                                            <Button icon color='orange' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
-                                                <Icon circular inverted color='orange' name='shopping cart'/>
-                                            </Button>}/>
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <SemanticPopup content='Tourist Attraction' trigger={
-                                            <Button icon color='green' onClick={() => this.searchByKeyword('tourist_attraction')}>
-                                                <Icon circular inverted color='green' name='camera retro'/>
-                                            </Button>}/>
-                                    </Grid.Column>
+                                    {/*<Grid.Column>*/}
+                                    {/*    <SemanticPopup content='Tourist Attraction' trigger={*/}
+                                    {/*        <Button icon color='green' onClick={() => this.searchByKeyword('tourist_attraction')}>*/}
+                                    {/*            <Icon circular inverted color='green' name='camera retro'/>*/}
+                                    {/*        </Button>}/>*/}
+                                    {/*</Grid.Column>*/}
                                 </Grid.Row>
                                 <Grid.Row>
                                     <Grid.Column>
@@ -279,8 +273,16 @@ class Map extends Component {
                                                 <Icon circular inverted color='pink' name='shirtsinbulk'/>
                                             </Button>}/>
                                     </Grid.Column>
+                                </Grid.Row>
+                                <Grid.Row>
                                     <Grid.Column>
-                                        <SemanticPopup content='Universities' trigger={
+                                        <SemanticPopup content='Shopping' trigger={
+                                            <Button icon color='orange' onClick={() => this.searchByKeyword('grocery_or_supermarket')}>
+                                                <Icon circular inverted color='orange' name='shopping cart'/>
+                                            </Button>}/>
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        <SemanticPopup content='Museums' trigger={
                                             <Button icon color='brown' onClick={() => this.searchByKeyword('museum')}>
                                                 <Icon circular inverted color='brown' name='university'/>
                                             </Button>}/>
@@ -292,7 +294,7 @@ class Map extends Component {
                                             </Button>}/>
                                     </Grid.Column>
                                 </Grid.Row>
-                        </Grid>
+                            </Grid>
                         </Container>
                     </div>
                     )}
@@ -696,6 +698,11 @@ class Map extends Component {
 
         return(
             <SiteWrapper>
+
+                <ToastContainer
+                    autoClose={2000}
+                />
+
                 <div style={{
                     position: "relative",
                     overflow: "hidden",
@@ -703,7 +710,6 @@ class Map extends Component {
                 }}>
 
                     <Drawer
-                        width="25vw"
                         getContainer={null}
                         showMask={false}
                         defaultOpen={true}

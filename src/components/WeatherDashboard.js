@@ -20,7 +20,7 @@ class WeatherDashboard extends PureComponent{
       const weatherData = this.props.data;
 
       return (
-          <Card>
+          <Card fluid>
               { weatherData && weatherData.weather && weatherData.weather.length > 0 && (
                   <Card.Content>
                       <Image

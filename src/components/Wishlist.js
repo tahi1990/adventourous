@@ -38,7 +38,7 @@ class Wishlist extends PureComponent{
         const wishlist = user.wishlist.slice(0,2);
 
         return(
-            <Card>
+            <Card fluid>
                 <Card.Content>
                     <Card.Header>Your wishlist</Card.Header>
                     <List>
